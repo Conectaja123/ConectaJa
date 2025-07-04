@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConectaServiços - Encontre Prestadores Perto de Você</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons: Heroicons (são inseridos diretamente no HTML para simplicidade) -->
+
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* gray-50 */
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+        }
+        .cpf-invalido, .input-invalido {
+            border-color: #ef4444; /* red-500 */
+        }
+        .cpf-valido {
+            border-color: #22c55e; /* green-500 */
+        }
+        /* Animação para o modal */
+        .modal-scale-enter {
+            animation: scale-in 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+        }
+        .modal-scale-leave {
+            animation: scale-out 0.3s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+        }
+        @keyframes scale-in {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes scale-out {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0; }
+        }
+        .dropdown-menu {
+            z-index: 20;
+        }
+        .card-clicavel {
+            cursor: pointer;
+        }
+        /* Scrollbar customizada para os modais */
+        .modal-scrollable::-webkit-scrollbar { width: 8px; }
+        .modal-scrollable::-webkit-scrollbar-track { background: #f1f1f1; }
+        .modal-scrollable::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .modal-scrollable::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- =========== Cabeçalho e Navegação =========== -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl font-bold text-blue-600">ConectaServiços</a>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex md:items-center md:space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Início</a>
+                    <a href="#servicos" class="text-gray-600 hover:text-blue-600 font-medium">Serviços</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Sobre Nós</a>
+                </div>
+
+                <!-- Botões de Ação (Estado Deslogado) -->
+                <div id="header-anonimo" class="flex items-center space-x-2">
+                    <button id="btn-abrir-login" class="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Login</button>
+                    <button id="btn-abrir-escolha" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">Cadastre-se</button>
+                </div>
+                
+                <!-- Perfil do Usuário (Estado Logado) -->
+                <div id="header-logado" class="hidden items-center space-x-4 relative">
+                    <span id="greeting-message" class="text-sm text-gray-600 hidden"></span>
+                    <button id="btn-abrir-anuncio" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+                        Criar Anúncio
+                    </button>
+                    <div id="perfil-dropdown-container">
+                        <img id="header-foto-perfil" src="" alt="Foto do Perfil" class="w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-blue-500">
+                        <div id="perfil-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 dropdown-menu">
+                            <!-- Conteúdo do menu é dinâmico -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <section class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Encontre o profissional certo, na hora certa.</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Milhares de prestadores de serviço qualificados e avaliados, prontos para atender você.</p>
+        </section>
+
+        <!-- Filtros de Busca -->
+        <div id="search-filters" class="bg-white p-6 rounded-xl shadow-lg mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div class="lg:col-span-2">
+                    <label for="tipo-servico" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Serviço</label>
+                    <input type="text" id="tipo-servico" placeholder="Ex: Eletricista, Encanador" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                     <label for="search-cep" class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
+                     <input type="text" id="search-cep" placeholder="00000-000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="search-cidade" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                    <input type="text" id="search-cidade" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                </div>
+                 <div>
+                    <label for="search-estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <input type="text" id="search-estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <label for="search-rua" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+                    <input type="text" id="search-rua" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                </div>
+                 <div>
+                    <label for="search-bairro" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                    <input type="text" id="search-bairro" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label for="raio-atendimento" class="block text-sm font-medium text-gray-700 mb-1">Raio (KM)</label>
+                    <select id="raio-atendimento" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Qualquer</option>
+                        <option value="5">Até 5 km</option>
+                        <option value="10">Até 10 km</option>
+                        <option value="25">Até 25 km</option>
+                        <option value="50">Até 50 km</option>
+                         <option value="100">Até 100 km</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="btn-buscar" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section id="servicos">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Prestadores em Destaque</h2>
+            <div id="service-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <a href="#" id="btn-abrir-avaliacao-site" class="text-blue-400 hover:text-blue-300 hover:underline">Avalie nosso site</a>
+            <p class="text-sm text-gray-400 mt-4">© 2024 ConectaServiços. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- =========== MODAIS =========== -->
+    
+    <!-- Modal de LOGIN -->
+    <div id="modal-login" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900">Acessar sua Conta</h3>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="form-login" class="p-8 space-y-6">
+                 <div>
+                    <label for="login-email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                    <input type="email" id="login-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="login-senha" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" id="login-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de CRIAR ANÚNCIO -->
+    <div id="modal-criar-anuncio" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Criar Novo Anúncio</h3>
+                    <p class="text-sm text-gray-500">Detalhe o serviço que você quer oferecer.</p>
+                </div>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="form-criar-anuncio" class="p-8 space-y-6">
+                <div>
+                    <label for="anuncio-titulo" class="block text-sm font-medium text-gray-700">Título do Anúncio</label>
+                    <input type="text" id="anuncio-titulo" placeholder="Ex: Promoção de Instalação de Ar Condicionado" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="anuncio-tipo-servico" class="block text-sm font-medium text-gray-700">Tipo de Serviço</label>
+                    <input type="text" id="anuncio-tipo-servico" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label for="anuncio-descricao" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
+                    <textarea id="anuncio-descricao" rows="4" placeholder="Descreva o que está incluso, materiais, tempo estimado, etc." required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Fotos do Serviço (Máx. 4)</label>
+                    <input type="file" id="anuncio-fotos" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <div id="fotos-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Previews das imagens aparecerão aqui -->
+                    </div>
+                </div>
+            </form>
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                <button type="submit" form="form-criar-anuncio" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Publicar Anúncio</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal de ESCOLHA de Tipo de Cadastro -->
+    <div id="modal-escolha-cadastro" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter text-center">
+             <div class="p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Como você quer se juntar a nós?</h3>
+                <p class="text-sm text-gray-500 mt-1">Escolha o tipo de perfil que deseja criar.</p>
+            </div>
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button id="btn-escolha-cliente" class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-blue-500 mb-3"><path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 5.69 3.117A1 1 0 0 1 16.999 16.5h-10a1 1 0 0 1-.69-.383Z" clip-rule="evenodd" /></svg>
+                    <span class="font-semibold text-lg">Sou Cliente</span>
+                    <span class="text-sm text-gray-500">Quero contratar serviços</span>
+                </button>
+                <button id="btn-escolha-prestador" class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-green-500 mb-3"><path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM2.25 7.93v6.54l8.628 5.032a.75.75 0 0 0 .744 0l-9-5.25v-9l9 5.25-9-5.25Z" /></svg>
+                    <span class="font-semibold text-lg">Sou Prestador</span>
+                    <span class="text-sm text-gray-500">Quero oferecer serviços</span>
+                </button>
+            </div>
+             <div class="p-4 bg-gray-50 border-t text-right">
+                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro do CLIENTE -->
+    <div id="modal-cadastro-cliente" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Cadastro de Cliente</h3>
+                    <p class="text-sm text-gray-500">Crie sua conta para contratar e avaliar serviços.</p>
+                </div>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="form-cadastro-cliente" class="p-8 space-y-6">
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="cliente-email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                            <input type="email" id="cliente-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="cliente-senha" class="block text-sm font-medium text-gray-700">Senha</label>
+                            <input type="password" id="cliente-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label for="cliente-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                            <input type="text" id="cliente-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="cliente-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
+                            <input type="text" id="cliente-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <span id="cliente-cpf-status" class="text-xs mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Seu Endereço</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="cliente-cep" class="block text-sm font-medium text-gray-700">CEP</label>
+                            <input type="text" id="cliente-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="cliente-rua" class="block text-sm font-medium text-gray-700">Rua</label>
+                            <input type="text" id="cliente-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="cliente-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
+                            <input type="text" id="cliente-bairro" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="cliente-cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
+                            <input type="text" id="cliente-cidade" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="cliente-estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                            <input type="text" id="cliente-estado" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                <button type="submit" form="form-cadastro-cliente" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de LOGIN NECESSÁRIO -->
+    <div id="modal-login-necessario" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm modal-scale-enter text-center p-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <h3 class="text-xl font-bold text-gray-900 mt-4">Login Necessário</h3>
+            <p class="text-gray-600 mt-2">Para utilizar a busca por endereço e raio, você precisa estar logado.</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <button class="btn-fechar-modal px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
+                <button id="btn-ir-login" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Fazer Login</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Cadastro do PRESTADOR -->
+    <div id="modal-cadastro-prestador" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div id="modal-content-prestador" class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Cadastro de Prestador de Serviço</h3>
+                    <p class="text-sm text-gray-500">Preencha seus dados para começar a oferecer seus services.</p>
+                </div>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="form-cadastro-prestador" class="p-8 space-y-6">
+                <!-- Seção Dados Pessoais -->
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="prestador-email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                            <input type="email" id="prestador-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="prestador-senha" class="block text-sm font-medium text-gray-700">Senha</label>
+                            <input type="password" id="prestador-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label for="prestador-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                            <input type="text" id="prestador-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="prestador-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
+                            <input type="text" id="prestador-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <span id="cpf-status" class="text-xs mt-1"></span>
+                        </div>
+                        <div>
+                             <label for="prestador-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+                             <input type="date" id="prestador-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="prestador-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
+                            <input type="tel" id="prestador-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Endereço de Atendimento</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="prestador-cep" class="block text-sm font-medium text-gray-700">CEP</label>
+                            <input type="text" id="prestador-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cep-status" class="text-xs mt-1"></span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="prestador-rua" class="block text-sm font-medium text-gray-700">Rua</label>
+                            <input type="text" id="prestador-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="prestador-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
+                            <input type="text" id="prestador-bairro" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="prestador-cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
+                            <input type="text" id="prestador-cidade" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="prestador-estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                            <input type="text" id="prestador-estado" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Perfil e Serviço</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div class="md:col-span-2">
+                             <label for="prestador-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
+                             <input type="text" id="prestador-servico" placeholder="Ex: Eletricista Residencial" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                         </div>
+                         <div>
+                            <label for="prestador-raio" class="block text-sm font-medium text-gray-700">Raio de Atendimento</label>
+                             <select id="prestador-raio" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="5">Até 5 km</option>
+                                <option value="10">Até 10 km</option>
+                                <option value="25">Até 25 km</option>
+                                <option value="50">Até 50 km</option>
+                                <option value="100">Até 100 km</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Foto de Perfil (Obrigatório)</label>
+                            <input type="file" id="prestador-foto" required accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                <button type="submit" form="form-cadastro-prestador" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal PERFIL -->
+    <div id="modal-perfil-prestador" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div id="modal-perfil-content" class="bg-gray-50 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-900">Perfil do Prestador</h3>
+                    <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 md:p-8" id="perfil-dinamico-conteudo">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal MEUS ANUNCIOS -->
+    <div id="modal-meus-anuncios" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Meus Anúncios</h3>
+                </div>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div id="meus-anuncios-lista" class="p-8 space-y-4">
+                 <!-- Anúncios serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Notificação Genérica -->
+    <div id="modal-notificacao" class="fixed bottom-5 right-5 z-[100] w-full max-w-sm hidden">
+        <div id="notificacao-content" class="p-4 rounded-lg shadow-2xl flex items-center gap-3">
+             <div id="notificacao-icone"></div>
+             <p id="notificacao-texto" class="font-medium"></p>
+        </div>
+    </div>
+
+    <!-- Modal de AVALIAÇÃO DO SITE -->
+    <div id="modal-avaliacao-site" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900">Avalie o ConectaServiços</h3>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="form-avaliacao-site" class="p-8 space-y-6">
+                 <div class="text-center">
+                    <p class="font-medium">O que você achou da sua experiência no site?</p>
+                    <div class="rating-stars mt-2">
+                        <input type="radio" id="site-star5" name="site-rating" value="5" required><label for="site-star5">★</label>
+                        <input type="radio" id="site-star4" name="site-rating" value="4"><label for="site-star4">★</label>
+                        <input type="radio" id="site-star3" name="site-rating" value="3"><label for="site-star3">★</label>
+                        <input type="radio" id="site-star2" name="site-rating" value="2"><label for="site-star2">★</label>
+                        <input type="radio" id="site-star1" name="site-rating" value="1"><label for="site-star1">★</label>
+                    </div>
+                </div>
+                <div>
+                    <label for="site-avaliacao-comentario" class="block text-sm font-medium text-gray-700">Deixe um comentário (opcional):</label>
+                    <textarea id="site-avaliacao-comentario" rows="4" placeholder="Suas sugestões são bem-vindas!" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                <button type="submit" class="w-full px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Enviar Avaliação</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- DADOS MOCK INICIAIS ---
+        const initialServiceProviders = [
+             { id: 1, userId: 1, nome: "Carlos Silva", servico: "Eletricista", localidade: "São Paulo, SP", latitude: -23.550520, longitude: -46.633308, raio: 25, avaliacao: 4.8, avaliacoesTotal: 125, telefone: "5511987654321", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", logo: null, descricao_longa: "Com mais de 15 anos de experiência, ofereço soluções completas em elétrica residencial e comercial. Segurança e qualidade são minhas prioridades.", galeria_fotos: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop", "https://images.unsplash.com/photo-1487401217342-829f10a1334c?q=80&w=1962&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Mariana P.", nota: 5, comentario: "Excelente profissional! Pontual, organizado e resolveu meu problema rapidamente."}]},
+             { id: 2, userId: 2, nome: "Fernanda Lima", servico: "Encanadora", localidade: "Rio de Janeiro, RJ", latitude: -22.906847, longitude: -43.172896, raio: 10, avaliacao: 4.9, avaliacoesTotal: 98, telefone: "5521912345678", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", logo: "https://placehold.co/100x100/e0e7ff/4f46e5?text=FL", descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas.", galeria_fotos: ["https://images.unsplash.com/photo-1582881348395-ead5503b2a59?q=80&w=2070&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Beatriz C.", nota: 5, comentario: "A Fernanda é fantástica! Encontrou um vazamento que ninguém mais achava."}]},
+        ];
+        const initialUsers = [
+             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista' },
+             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora' },
+             { id: 3, nome: "Cliente Teste", email: "cliente@email.com", senha: "123", tipo: "cliente", foto: "https://i.pravatar.cc/150?u=cliente@email.com", cep: "01001-000", rua: "Praça da Sé", bairro: "Sé", cidade: "São Paulo", estado: "SP" }
+        ];
+
+        // --- ESTADO DA APLICAÇÃO ---
+        let currentUser = null;
+        let users = [];
+        let serviceProviders = [];
+        
+        // --- FUNÇÕES ---
+
+        function initializeData() {
+            if (!localStorage.getItem('conecta_users')) {
+                localStorage.setItem('conecta_users', JSON.stringify(initialUsers));
+            }
+            if (!localStorage.getItem('conecta_providers')) {
+                 localStorage.setItem('conecta_providers', JSON.stringify(initialServiceProviders));
+            }
+            users = JSON.parse(localStorage.getItem('conecta_users'));
+            serviceProviders = JSON.parse(localStorage.getItem('conecta_providers'));
+        }
+
+        function saveUsers() {
+            localStorage.setItem('conecta_users', JSON.stringify(users));
+        }
+        
+        function saveProviders() {
+             localStorage.setItem('conecta_providers', JSON.stringify(serviceProviders));
+        }
+
+        async function populateSearchFiltersForClient() {
+            if (currentUser && currentUser.tipo === 'cliente' && currentUser.cep) {
+                document.getElementById('search-cep').value = currentUser.cep;
+                const result = await fetchCEPData(currentUser.cep);
+                if (result.data) {
+                    const { data } = result;
+                    document.getElementById('search-rua').value = data.logradouro;
+                    document.getElementById('search-bairro').value = data.bairro;
+                    document.getElementById('search-cidade').value = data.localidade;
+                    document.getElementById('search-estado').value = data.uf;
+                }
+            }
+        }
+
+        function checkSession() {
+            const loggedInUserId = sessionStorage.getItem('conecta_userId');
+            if (loggedInUserId) {
+                const foundUser = users.find(u => u.id == loggedInUserId);
+                if (foundUser) {
+                    currentUser = foundUser;
+                    updateHeaderUI();
+                    populateSearchFiltersForClient();
+                }
+            }
+        }
+        
+        function updateHeaderUI() {
+            const headerAnonimo = document.getElementById('header-anonimo');
+            const headerLogado = document.getElementById('header-logado');
+            const headerFotoPerfil = document.getElementById('header-foto-perfil');
+            const perfilDropdownMenu = document.getElementById('perfil-dropdown-menu');
+            const greetingMessage = document.getElementById('greeting-message');
+            const btnAbrirAnuncio = document.getElementById('btn-abrir-anuncio');
+
+            if (currentUser) {
+                headerAnonimo.classList.add('hidden');
+                headerLogado.classList.remove('hidden');
+                headerLogado.classList.add('flex');
+                headerFotoPerfil.src = currentUser.foto;
+
+                if (currentUser.tipo === 'cliente') {
+                    greetingMessage.textContent = `Olá, ${currentUser.nome.split(' ')[0]}`;
+                    greetingMessage.classList.remove('hidden');
+                    btnAbrirAnuncio.classList.add('hidden');
+                    perfilDropdownMenu.innerHTML = `
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar Perfil</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preferências</a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
+                    `;
+                } else if (currentUser.tipo === 'prestador') {
+                    greetingMessage.classList.add('hidden');
+                    btnAbrirAnuncio.classList.remove('hidden');
+                    perfilDropdownMenu.innerHTML = `
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                        <a href="#" id="btn-meus-anuncios" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meus Anúncios</a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
+                    `;
+                }
+                
+                const logoutButton = document.getElementById('btn-logout-dynamic');
+                if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+
+                const myAdsButton = document.getElementById('btn-meus-anuncios');
+                if (myAdsButton) myAdsButton.addEventListener('click', openMyAdsModal);
+
+
+            } else {
+                headerAnonimo.classList.remove('hidden');
+                headerLogado.classList.add('hidden');
+                headerLogado.classList.remove('flex');
+                if(perfilDropdownMenu) perfilDropdownMenu.classList.add('hidden');
+            }
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notificacao = document.getElementById('modal-notificacao');
+            const content = document.getElementById('notificacao-content');
+            const icone = document.getElementById('notificacao-icone');
+            const texto = document.getElementById('notificacao-texto');
+
+            if (!notificacao || !content || !icone || !texto) return;
+
+            texto.textContent = message;
+
+            if (type === 'success') {
+                content.className = 'p-4 rounded-lg shadow-2xl flex items-center gap-3 bg-green-500 text-white';
+                icone.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg>`;
+            } else { 
+                content.className = 'p-4 rounded-lg shadow-2xl flex items-center gap-3 bg-red-500 text-white';
+                icone.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z M8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" /></svg>`;
+            }
+
+            notificacao.classList.remove('hidden');
+            setTimeout(() => {
+                notificacao.classList.add('hidden');
+            }, 4000);
+        }
+
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g,'');	
+            if(cpf == '') return false;	
+            if (cpf.length != 11 || 
+                ["00000000000", "11111111111", "22222222222", "33333333333", "44444444444", "55555555555", "66666666666", "77777777777", "88888888888", "99999999999"].includes(cpf))
+                    return false;		
+            let add = 0;	
+            for (let i=0; i < 9; i ++) add += parseInt(cpf.charAt(i)) * (10 - i);	
+            let rev = 11 - (add % 11);	
+            if (rev == 10 || rev == 11) rev = 0;	
+            if (rev != parseInt(cpf.charAt(9))) return false;		
+            add = 0;	
+            for (let i = 0; i < 10; i ++) add += parseInt(cpf.charAt(i)) * (11 - i);	
+            rev = 11 - (add % 11);	
+            if (rev == 10 || rev == 11) rev = 0;	
+            if (rev != parseInt(cpf.charAt(10))) return false;		
+            return true;   
+        }
+
+        function handleRegisterCliente(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form['cliente-email'].value;
+            const cpfInput = form['cliente-cpf'];
+            
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(input => {
+                if (!input.value) { isValid = false; input.classList.add('input-invalido'); } 
+                else { input.classList.remove('input-invalido'); }
+            });
+            
+            if (!validateCPF(cpfInput.value)) {
+                showNotification('CPF inválido.', 'error');
+                cpfInput.classList.add('input-invalido');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showNotification('Por favor, corrija os campos marcados.', 'error');
+                return;
+            }
+
+            if (users.find(u => u.email === email)) {
+                showNotification('Este e-mail já está cadastrado.', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                tipo: 'cliente',
+                email: email,
+                senha: form['cliente-senha'].value,
+                nome: form['cliente-nome'].value,
+                cpf: cpfInput.value,
+                cep: form['cliente-cep'].value,
+                rua: form['cliente-rua'].value,
+                bairro: form['cliente-bairro'].value,
+                cidade: form['cliente-cidade'].value,
+                estado: form['cliente-estado'].value,
+                foto: `https://i.pravatar.cc/150?u=${email}`
+            };
+            
+            users.push(newUser);
+            saveUsers();
+            
+            showNotification('Cadastro de cliente realizado com sucesso!', 'success');
+            closeModal(document.getElementById('modal-cadastro-cliente'));
+            form.reset();
+        }
+
+        function handleRegisterPrestador(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form['prestador-email'].value;
+            const cpfInput = form['prestador-cpf'];
+
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(input => {
+                if (!input.value) { isValid = false; input.classList.add('input-invalido'); } 
+                else { input.classList.remove('input-invalido'); }
+            });
+            
+            if (!validateCPF(cpfInput.value)) {
+                showNotification('CPF inválido.', 'error');
+                cpfInput.classList.add('input-invalido');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showNotification('Por favor, corrija os campos marcados.', 'error');
+                return;
+            }
+
+            if (users.find(u => u.email === email)) {
+                showNotification('Este e-mail já está cadastrado.', 'error');
+                return;
+            }
+            
+            const fotoInput = form['prestador-foto'];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const newUser = {
+                    id: Date.now(),
+                    tipo: 'prestador',
+                    email: email,
+                    senha: form['prestador-senha'].value,
+                    nome: form['prestador-nome'].value,
+                    cpf: cpfInput.value,
+                    nascimento: form['prestador-nascimento'].value,
+                    telefone: form['prestador-telefone'].value,
+                    cep: form['prestador-cep'].value,
+                    servicoPrincipal: form['prestador-servico'].value,
+                    raio: form['prestador-raio'].value,
+                    foto: e.target.result,
+                };
+                
+                users.push(newUser);
+                saveUsers();
+                
+                showNotification('Cadastro realizado com sucesso!', 'success');
+                closeModal(document.getElementById('modal-cadastro-prestador'));
+                form.reset();
+            };
+
+            if (fotoInput.files.length > 0) {
+                 reader.readAsDataURL(fotoInput.files[0]);
+            } else {
+                 showNotification('Por favor, adicione uma foto de perfil.', 'error');
+            }
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form['login-email'].value;
+            const senha = form['login-senha'].value;
+            
+            const foundUser = users.find(u => u.email === email && u.senha === senha);
+            
+            if (foundUser) {
+                currentUser = foundUser;
+                sessionStorage.setItem('conecta_userId', currentUser.id);
+                updateHeaderUI();
+                await populateSearchFiltersForClient();
+                closeModal(document.getElementById('modal-login'));
+                showNotification(`Bem-vindo(a) de volta, ${currentUser.nome.split(' ')[0]}!`, 'success');
+            } else {
+                showNotification('E-mail ou senha inválidos.', 'error');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('conecta_userId');
+            updateHeaderUI();
+            ['search-cep', 'search-rua', 'search-bairro', 'search-cidade', 'search-estado'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function handleCreateAd(event) {
+            event.preventDefault();
+            const form = event.target;
+            const fotosInput = form['anuncio-fotos'];
+            
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(input => {
+                if (!input.value) { isValid = false; input.classList.add('input-invalido'); } 
+                else { input.classList.remove('input-invalido'); }
+            });
+
+            if (!isValid) {
+                showNotification('Preencha o título e a descrição do anúncio.', 'error');
+                return;
+            }
+
+            if (fotosInput.files.length === 0) {
+                 showNotification('Adicione pelo menos uma foto ao anúncio.', 'error');
+                 return;
+            }
+
+            const newProviderAd = {
+                id: Date.now(),
+                userId: currentUser.id,
+                nome: currentUser.nome,
+                servico: form['anuncio-titulo'].value,
+                localidade: "Localidade (do perfil)",
+                raio: currentUser.raio,
+                avaliacao: 0,
+                avaliacoesTotal: 0,
+                telefone: currentUser.telefone,
+                foto: currentUser.foto,
+                logo: currentUser.logo || null,
+                descricao_longa: form['anuncio-descricao'].value,
+                galeria_fotos: [],
+                avaliacoes_detalhadas: []
+            };
+
+            const files = Array.from(fotosInput.files);
+            let processedFiles = 0;
+
+            files.forEach(file => {
+                 const reader = new FileReader();
+                 reader.onload = function(e) {
+                     newProviderAd.galeria_fotos.push(e.target.result);
+                     processedFiles++;
+                     if (processedFiles === files.length) {
+                         serviceProviders.push(newProviderAd);
+                         saveProviders();
+                         displayServiceCards(serviceProviders);
+                         showNotification('Anúncio publicado com sucesso!', 'success');
+                         closeModal(document.getElementById('modal-criar-anuncio'));
+                         form.reset();
+                         document.getElementById('fotos-preview').innerHTML = '';
+                     }
+                 }
+                 reader.readAsDataURL(file);
+            });
+        }
+        
+        function openModal(modalElement) {
+            if (!modalElement) return;
+            const content = modalElement.querySelector('.modal-scale-enter');
+            modalElement.classList.remove('hidden');
+            modalElement.classList.add('flex');
+            if(content) content.classList.remove('modal-scale-leave');
+        }
+
+        function closeModal(modalElement) {
+             if (!modalElement) return;
+            const content = modalElement.querySelector('.modal-scale-enter');
+            if(content) content.classList.add('modal-scale-leave');
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                modalElement.classList.remove('flex');
+            }, 300);
+        }
+        
+        async function fetchCEPData(cep) {
+            const cepLimpo = cep.replace(/\D/g, '');
+            if (cepLimpo.length !== 8) return { error: 'CEP inválido.' };
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+                if (!response.ok) throw new Error('Erro na busca.');
+                const data = await response.json();
+                if (data.erro) return { error: 'CEP não encontrado.' };
+                return { data };
+            } catch (error) {
+                return { error: 'Erro ao buscar CEP.' };
+            }
+        }
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            if ((lat1 == lat2) && (lon1 == lon2)) return 0;
+            const R = 6371; // Raio da Terra em km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        async function handleSearch() {
+            if (!currentUser) {
+                openModal(document.getElementById('modal-login-necessario'));
+                return;
+            }
+
+            let filteredProviders = [...serviceProviders];
+
+            const serviceQuery = document.getElementById('tipo-servico').value.toLowerCase();
+            const cityQuery = document.getElementById('search-cidade').value.toLowerCase();
+            const radiusValue = document.getElementById('raio-atendimento').value;
+            
+            const userLocation = { lat: -23.550520, lon: -46.633308 }; 
+            
+            if (serviceQuery) {
+                filteredProviders = filteredProviders.filter(p => p.servico.toLowerCase().includes(serviceQuery));
+            }
+
+            if (cityQuery) {
+                filteredProviders = filteredProviders.filter(p => p.localidade.toLowerCase().includes(cityQuery));
+            }
+
+            if (radiusValue) {
+                const radiusKm = parseInt(radiusValue);
+                filteredProviders = filteredProviders.filter(p => {
+                    if (p.latitude && p.longitude) {
+                        const distance = calculateDistance(userLocation.lat, userLocation.lon, p.latitude, p.longitude);
+                        return distance <= radiusKm;
+                    }
+                    return false;
+                });
+            }
+
+            displayServiceCards(filteredProviders);
+        }
+
+        function handleSiteRating(event) {
+            event.preventDefault();
+            const form = event.target;
+            console.log("Avaliação do site enviada:", {
+                nota: form['site-rating'].value,
+                comentario: form['site-avaliacao-comentario'].value
+            });
+            closeModal(document.getElementById('modal-avaliacao-site'));
+            showNotification("Agradecemos seu feedback!", "success");
+        }
+        
+        function generateStars(rating, size = 'w-4 h-4') {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 !== 0;
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < fullStars; i++) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
+            if (halfStar) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118L10 15.347V2.927z"></path></svg>`; }
+            for (let i = 0; i < emptyStars; i++) { stars += `<svg class="${size} text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
+            return stars;
+        }
+
+        function displayServiceCards(providers) {
+            const grid = document.getElementById('service-cards-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (providers.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center">Nenhum resultado encontrado para os filtros aplicados.</p>`;
+                return;
+            }
+            providers.forEach(provider => {
+                const cardHTML = `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                    <div class="relative card-clicavel" data-provider-id="${provider.id}">
+                        <img class="h-40 w-full object-cover pointer-events-none" src="${provider.foto}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Sem+Foto';" alt="Foto de ${provider.nome}">
+                        ${provider.logo ? `<img class="w-16 h-16 rounded-full border-4 border-white absolute -bottom-8 right-4 pointer-events-none" src="${provider.logo}" alt="Logo de ${provider.nome}">` : ''}
+                    </div>
+                    <div class="p-5 flex-grow card-clicavel" data-provider-id="${provider.id}">
+                        <div class="uppercase tracking-wide text-sm text-blue-600 font-semibold pointer-events-none">${provider.servico}</div>
+                        <p class="block mt-1 text-lg leading-tight font-bold text-black pointer-events-none">${provider.nome}</p>
+                        <p class="mt-2 text-sm text-gray-500 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            ${provider.localidade}
+                        </p>
+                    </div>
+                    <div class="p-4 bg-gray-50 border-t">
+                        <div class="flex items-center justify-between">
+                            <div class="card-rating" data-provider-id="${provider.id}">
+                                <!-- Stars will be generated by JS -->
+                            </div>
+                            <span class="text-gray-600 text-sm font-medium" id="rating-text-${provider.id}">${provider.avaliacao.toFixed(1)} (${provider.avaliacoesTotal})</span>
+                        </div>
+                    </div>
+                </div>`;
+                grid.innerHTML += cardHTML;
+            });
+        }
+        
+        function openProfileModal(provider) {
+             const modalPerfil = document.getElementById('modal-perfil-prestador');
+            if (!modalPerfil || !provider) return;
+            const conteudoPerfil = document.getElementById('perfil-dinamico-conteudo');
+            
+            conteudoPerfil.innerHTML = `<div class="flex flex-col md:flex-row items-start gap-6 mb-8"><img class="w-32 h-32 rounded-full border-4 border-white shadow-lg flex-shrink-0" src="${provider.foto}" alt="Foto do prestador"><div class="flex-grow"><div class="flex items-center gap-4"><h2 class="text-3xl font-bold text-gray-900">${provider.nome}</h2>${provider.logo ? `<img class="w-12 h-12 rounded-lg" src="${provider.logo}" alt="Logo">` : ''}</div><p class="text-lg font-medium text-blue-600">${provider.servico}</p><div class="flex items-center mt-2">${generateStars(provider.avaliacao, 'w-5 h-5')}<span class="ml-2 text-gray-600 text-sm font-medium">${provider.avaliacao.toFixed(1)}</span><span class="ml-1 text-gray-500 text-sm">(${provider.avaliacoesTotal} avaliações)</span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><h4 class="text-lg font-semibold mb-2 text-gray-800">Sobre o Profissional</h4><p class="text-gray-600 leading-relaxed">${provider.descricao_longa}</p></div><div><h4 class="text-lg font-semibold mb-2 text-gray-800">Localização</h4><p class="text-gray-600 flex items-center gap-2"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${provider.localidade}</p></div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">Galeria de Trabalhos</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${(provider.galeria_fotos || []).map(fotoUrl => `<img src="${fotoUrl}" alt="Foto do trabalho" class="w-full h-32 object-cover rounded-lg">`).join('')}</div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">O que os clientes dizem</h4><div class="space-y-4">${(provider.avaliacoes_detalhadas || []).map(aval => `<div class="bg-white p-4 rounded-lg border"><div class="flex items-center mb-2">${generateStars(aval.nota)}<p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p></div><p class="text-gray-600">"${aval.comentario}"</p></div>`).join('')}</div></div><div class="p-6 border-t bg-gray-100 flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 -m-8 mt-8"><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Iniciar Chat</button><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Solicitar Orçamento</button></div>`;
+            openModal(document.getElementById('modal-perfil-prestador'));
+            document.getElementById('modal-perfil-content').scrollTop = 0;
+        }
+
+        function openMyAdsModal() {
+            const modal = document.getElementById('modal-meus-anuncios');
+            const listContainer = document.getElementById('meus-anuncios-lista');
+            const myAds = serviceProviders.filter(ad => ad.userId === currentUser.id);
+
+            if (myAds.length === 0) {
+                listContainer.innerHTML = `<p class="text-gray-500 text-center">Você ainda não criou nenhum anúncio.</p>`;
+            } else {
+                listContainer.innerHTML = myAds.map(ad => `
+                    <div class="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
+                        <div>
+                            <h4 class="font-semibold">${ad.servico}</h4>
+                            <p class="text-sm text-gray-600">${ad.descricao_longa.substring(0, 50)}...</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="text-sm text-blue-600 hover:underline">Editar</button>
+                            <button class="text-sm text-red-600 hover:underline">Excluir</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            openModal(modal);
+        }
+
+        // --- EVENT LISTENERS ---
+        
+        document.getElementById('btn-abrir-login').addEventListener('click', () => openModal(document.getElementById('modal-login')));
+        document.getElementById('form-login').addEventListener('submit', handleLogin);
+        
+        document.getElementById('form-cadastro-prestador').addEventListener('submit', handleRegisterPrestador);
+        document.getElementById('form-cadastro-cliente').addEventListener('submit', handleRegisterCliente);
+        document.getElementById('form-criar-anuncio').addEventListener('submit', handleCreateAd);
+        
+        document.querySelectorAll('.modal-backdrop').forEach(modal => {
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal) });
+            const closeButton = modal.querySelector('.btn-fechar-modal');
+            if (closeButton) closeButton.addEventListener('click', () => closeModal(modal));
+        });
+
+        document.getElementById('btn-abrir-escolha').addEventListener('click', () => openModal(document.getElementById('modal-escolha-cadastro')));
+        document.getElementById('btn-escolha-prestador').addEventListener('click', () => {
+            closeModal(document.getElementById('modal-escolha-cadastro'));
+            setTimeout(() => openModal(document.getElementById('modal-cadastro-prestador')), 300);
+        });
+        document.getElementById('btn-escolha-cliente').addEventListener('click', () => {
+            closeModal(document.getElementById('modal-escolha-cadastro'));
+            setTimeout(() => openModal(document.getElementById('modal-cadastro-cliente')), 300);
+        });
+        document.getElementById('btn-abrir-anuncio').addEventListener('click', () => {
+            if(currentUser && currentUser.tipo === 'prestador') {
+                document.getElementById('anuncio-tipo-servico').value = currentUser.servicoPrincipal;
+                openModal(document.getElementById('modal-criar-anuncio'));
+            }
+        });
+
+        document.getElementById('btn-ir-login').addEventListener('click', () => {
+            closeModal(document.getElementById('modal-login-necessario'));
+            setTimeout(() => openModal(document.getElementById('modal-login')), 300);
+        });
+        
+        document.getElementById('prestador-cep').addEventListener('blur', async (e) => {
+            const cepStatus = document.getElementById('cep-status');
+            const result = await fetchCEPData(e.target.value);
+            if (result.error) {
+                cepStatus.textContent = result.error;
+                cepStatus.className = 'text-xs mt-1 text-red-600';
+            } else {
+                const { data } = result;
+                document.getElementById('prestador-rua').value = data.logradouro;
+                document.getElementById('prestador-bairro').value = data.bairro;
+                document.getElementById('prestador-cidade').value = data.localidade;
+                document.getElementById('prestador-estado').value = data.uf;
+                cepStatus.textContent = 'Endereço preenchido!';
+                cepStatus.className = 'text-xs mt-1 text-green-600';
+            }
+        });
+
+        document.getElementById('cliente-cep').addEventListener('blur', async (e) => {
+            const result = await fetchCEPData(e.target.value);
+            if(result.data) {
+                document.getElementById('cliente-rua').value = result.data.logradouro;
+                document.getElementById('cliente-bairro').value = result.data.bairro;
+                document.getElementById('cliente-cidade').value = result.data.localidade;
+                document.getElementById('cliente-estado').value = result.data.uf;
+            }
+        });
+
+        document.getElementById('search-cep').addEventListener('blur', async (e) => {
+            const result = await fetchCEPData(e.target.value);
+            if (result.data) {
+                const { data } = result;
+                document.getElementById('search-rua').value = data.logradouro;
+                document.getElementById('search-bairro').value = data.bairro;
+                document.getElementById('search-cidade').value = data.localidade;
+                document.getElementById('search-estado').value = data.uf;
+            } else {
+                ['search-rua', 'search-bairro', 'search-cidade', 'search-estado'].forEach(id => document.getElementById(id).value = '');
+            }
+        });
+
+        document.getElementById('prestador-cpf').addEventListener('input', e => {
+            const cpfInput = e.target;
+            const cpfStatus = document.getElementById('cpf-status');
+            if (validateCPF(cpfInput.value)) {
+                cpfStatus.textContent = 'CPF válido!';
+                cpfStatus.className = 'text-xs text-green-600';
+                cpfInput.classList.remove('cpf-invalido');
+                cpfInput.classList.add('cpf-valido');
+            } else {
+                cpfStatus.textContent = 'CPF inválido.';
+                cpfStatus.className = 'text-xs text-red-600';
+                cpfInput.classList.remove('cpf-valido');
+                cpfInput.classList.add('cpf-invalido');
+            }
+        });
+        
+        document.getElementById('cliente-cpf').addEventListener('input', e => {
+            const cpfInput = e.target;
+            const cpfStatus = document.getElementById('cliente-cpf-status');
+            if (validateCPF(cpfInput.value)) {
+                cpfStatus.textContent = 'CPF válido!';
+                cpfStatus.className = 'text-xs text-green-600';
+                cpfInput.classList.remove('cpf-invalido');
+                cpfInput.classList.add('cpf-valido');
+            } else {
+                cpfStatus.textContent = 'CPF inválido.';
+                cpfStatus.className = 'text-xs text-red-600';
+                cpfInput.classList.remove('cpf-valido');
+                cpfInput.classList.add('cpf-invalido');
+            }
+        });
+
+        document.getElementById('anuncio-fotos').addEventListener('change', function(event) {
+            const previewContainer = document.getElementById('fotos-preview');
+            previewContainer.innerHTML = '';
+            const files = Array.from(event.target.files);
+            if (files.length > 4) {
+                showNotification('Você pode selecionar no máximo 4 fotos.', 'error');
+                event.target.value = '';
+                return;
+            }
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.alt = 'Preview da foto';
+                    imgElement.className = 'w-full h-24 object-cover rounded-md';
+                    previewContainer.appendChild(imgElement);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+        
+        document.getElementById('service-cards-grid').addEventListener('click', function(e) {
+            const cardClicavel = e.target.closest('.card-clicavel');
+            if (cardClicavel) {
+                const providerId = cardClicavel.dataset.providerId;
+                const providerData = serviceProviders.find(p => p.id == providerId);
+                if (providerData) openProfileModal(providerData);
+            }
+        });
+        
+        document.getElementById('btn-buscar').addEventListener('click', handleSearch);
+        
+        const formAvaliacaoSite = document.getElementById('form-avaliacao-site');
+        if (formAvaliacaoSite) {
+            formAvaliacaoSite.addEventListener('submit', handleSiteRating);
+        }
+
+        const btnAbrirAvaliacaoSite = document.getElementById('btn-abrir-avaliacao-site');
+        if(btnAbrirAvaliacaoSite) {
+             btnAbrirAvaliacaoSite.addEventListener('click', () => openModal(document.getElementById('modal-avaliacao-site')));
+        }
+       
+        // --- CHAMADA INICIAL ---
+        initializeData();
+        checkSession();
+        displayServiceCards(serviceProviders);
+    });
+    </script>
+</body>
+</html>
