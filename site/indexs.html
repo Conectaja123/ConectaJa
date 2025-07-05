@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConectaServiços - Encontre Prestadores Perto de Você --- brendon</title>
+    <title>ConectaServiços - Encontre Prestadores Perto de Você</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,15 +19,13 @@
         /* Estilos personalizados */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;/*2*/
-            background-color: #f8fafc;/*222222*/
             background-color: #f8fafc; /* gray-50 */
         }
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5);
             transition: opacity 0.3s ease;
         }
-        .cpf-invalido, .input-invalido {
+        .input-invalido {
             border-color: #ef4444; /* red-500 */
         }
         .cpf-valido {
@@ -105,7 +103,7 @@
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <section class="text-center mb-12">
-            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Encontre o profissional certo, nasa hora certa.</h1>
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Encontre o profissional certo, na hora certa.</h1>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">Milhares de prestadores de serviço qualificados e avaliados, prontos para atender você.</p>
         </section>
 
@@ -138,6 +136,10 @@
                     <input type="text" id="search-bairro" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
                 </div>
                 <div>
+                    <label for="search-numero" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                    <input type="text" id="search-numero" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
                     <label for="raio-atendimento" class="block text-sm font-medium text-gray-700 mb-1">Raio (KM)</label>
                     <select id="raio-atendimento" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Qualquer</option>
@@ -167,7 +169,7 @@
     <footer class="bg-gray-800 text-white mt-16">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
             <a href="#" id="btn-abrir-avaliacao-site" class="text-blue-400 hover:text-blue-300 hover:underline">Avalie nosso site</a>
-            <p class="text-sm text-gray-400 mt-4">© 2024 ConectaServiços. Todos os direitos reservados.</p>
+            <p class="text-sm text-gray-400 mt-2">© 2024 ConectaServiços. Todos os direitos reservados.</p>
         </div>
     </footer>
 
@@ -178,9 +180,6 @@
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter">
             <div class="p-6 border-b flex justify-between items-center">
                 <h3 class="text-xl font-bold text-gray-900">Acessar sua Conta</h3>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             <form id="form-login" class="p-8 space-y-6">
                  <div>
@@ -191,7 +190,10 @@
                     <label for="login-senha" class="block text-sm font-medium text-gray-700">Senha</label>
                     <input type="password" id="login-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <button type="submit" class="w-full px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Entrar</button>
+                <div class="flex items-center justify-end gap-4">
+                    <button type="button" class="btn-fechar-modal px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Entrar</button>
+                </div>
             </form>
         </div>
     </div>
@@ -204,9 +206,6 @@
                     <h3 class="text-xl font-bold text-gray-900">Criar Novo Anúncio</h3>
                     <p class="text-sm text-gray-500">Detalhe o serviço que você quer oferecer.</p>
                 </div>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             <form id="form-criar-anuncio" class="p-8 space-y-6">
                 <div>
@@ -218,7 +217,12 @@
                     <input type="text" id="anuncio-tipo-servico" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
                 </div>
                 <div>
-                    <label for="anuncio-descricao" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="anuncio-descricao" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
+                        <button type="button" id="btn-gerar-descricao" class="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded-full px-3 py-1 flex items-center gap-1">
+                            ✨ Gerar com IA
+                        </button>
+                    </div>
                     <textarea id="anuncio-descricao" rows="4" placeholder="Descreva o que está incluso, materiais, tempo estimado, etc." required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
                 <div>
@@ -270,9 +274,6 @@
                     <h3 class="text-xl font-bold text-gray-900">Cadastro de Cliente</h3>
                     <p class="text-sm text-gray-500">Crie sua conta para contratar e avaliar serviços.</p>
                 </div>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             <form id="form-cadastro-cliente" class="p-8 space-y-6">
                 <div>
@@ -300,6 +301,11 @@
                             <input type="text" id="cliente-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                             <span id="cliente-cpf-status" class="text-xs mt-1"></span>
                         </div>
+                        <div>
+                             <label for="cliente-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+                             <input type="date" id="cliente-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="cliente-nascimento-status" class="text-xs mt-1 text-red-600"></span>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -309,9 +315,13 @@
                             <label for="cliente-cep" class="block text-sm font-medium text-gray-700">CEP</label>
                             <input type="text" id="cliente-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
-                        <div class="md:col-span-2">
+                         <div class="md:col-span-2">
                             <label for="cliente-rua" class="block text-sm font-medium text-gray-700">Rua</label>
                             <input type="text" id="cliente-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="cliente-numero" class="block text-sm font-medium text-gray-700">Número</label>
+                            <input type="text" id="cliente-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div>
                             <label for="cliente-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
@@ -358,9 +368,6 @@
                     <h3 class="text-xl font-bold text-gray-900">Cadastro de Prestador de Serviço</h3>
                     <p class="text-sm text-gray-500">Preencha seus dados para começar a oferecer seus services.</p>
                 </div>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             <form id="form-cadastro-prestador" class="p-8 space-y-6">
                 <!-- Seção Dados Pessoais -->
@@ -387,11 +394,12 @@
                         <div>
                             <label for="prestador-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
                             <input type="text" id="prestador-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <span id="cpf-status" class="text-xs mt-1"></span>
+                            <span id="prestador-cpf-status" class="text-xs mt-1"></span>
                         </div>
                         <div>
                              <label for="prestador-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
                              <input type="date" id="prestador-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="prestador-nascimento-status" class="text-xs mt-1 text-red-600"></span>
                         </div>
                         <div>
                             <label for="prestador-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
@@ -405,11 +413,14 @@
                         <div>
                             <label for="prestador-cep" class="block text-sm font-medium text-gray-700">CEP</label>
                             <input type="text" id="prestador-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cep-status" class="text-xs mt-1"></span>
                         </div>
-                        <div class="md:col-span-2">
+                         <div class="md:col-span-2">
                             <label for="prestador-rua" class="block text-sm font-medium text-gray-700">Rua</label>
                             <input type="text" id="prestador-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label for="prestador-numero" class="block text-sm font-medium text-gray-700">Número</label>
+                            <input type="text" id="prestador-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div>
                             <label for="prestador-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
@@ -468,23 +479,6 @@
                 </div>
             </div>
             <div class="p-6 md:p-8" id="perfil-dinamico-conteudo">
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal MEUS ANUNCIOS -->
-    <div id="modal-meus-anuncios" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900">Meus Anúncios</h3>
-                </div>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div id="meus-anuncios-lista" class="p-8 space-y-4">
-                 <!-- Anúncios serão inseridos aqui -->
             </div>
         </div>
     </div>
@@ -684,11 +678,23 @@
             return true;   
         }
 
+        function validateAge(birthDateString) {
+            const birthDate = new Date(birthDateString);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 15;
+        }
+
         function handleRegisterCliente(event) {
             event.preventDefault();
             const form = event.target;
             const email = form['cliente-email'].value;
             const cpfInput = form['cliente-cpf'];
+            const birthDateInput = form['cliente-nascimento'];
             
             let isValid = true;
             form.querySelectorAll('[required]').forEach(input => {
@@ -699,6 +705,12 @@
             if (!validateCPF(cpfInput.value)) {
                 showNotification('CPF inválido.', 'error');
                 cpfInput.classList.add('input-invalido');
+                isValid = false;
+            }
+
+             if(!validateAge(birthDateInput.value)) {
+                showNotification('Você precisa ter pelo menos 15 anos para se cadastrar.', 'error');
+                birthDateInput.classList.add('input-invalido');
                 isValid = false;
             }
 
@@ -719,6 +731,7 @@
                 senha: form['cliente-senha'].value,
                 nome: form['cliente-nome'].value,
                 cpf: cpfInput.value,
+                nascimento: birthDateInput.value,
                 cep: form['cliente-cep'].value,
                 rua: form['cliente-rua'].value,
                 bairro: form['cliente-bairro'].value,
@@ -733,6 +746,11 @@
             showNotification('Cadastro de cliente realizado com sucesso!', 'success');
             closeModal(document.getElementById('modal-cadastro-cliente'));
             form.reset();
+            
+            currentUser = newUser;
+            sessionStorage.setItem('conecta_userId', currentUser.id);
+            updateHeaderUI();
+            populateSearchFiltersForClient();
         }
 
         function handleRegisterPrestador(event) {
@@ -740,6 +758,7 @@
             const form = event.target;
             const email = form['prestador-email'].value;
             const cpfInput = form['prestador-cpf'];
+            const birthDateInput = form['prestador-nascimento'];
 
             let isValid = true;
             form.querySelectorAll('[required]').forEach(input => {
@@ -750,6 +769,12 @@
             if (!validateCPF(cpfInput.value)) {
                 showNotification('CPF inválido.', 'error');
                 cpfInput.classList.add('input-invalido');
+                isValid = false;
+            }
+
+             if(!validateAge(birthDateInput.value)) {
+                showNotification('Você precisa ter pelo menos 15 anos para se cadastrar.', 'error');
+                birthDateInput.classList.add('input-invalido');
                 isValid = false;
             }
 
@@ -774,12 +799,12 @@
                     senha: form['prestador-senha'].value,
                     nome: form['prestador-nome'].value,
                     cpf: cpfInput.value,
-                    nascimento: form['prestador-nascimento'].value,
+                    nascimento: birthDateInput.value,
                     telefone: form['prestador-telefone'].value,
                     cep: form['prestador-cep'].value,
                     servicoPrincipal: form['prestador-servico'].value,
                     raio: form['prestador-raio'].value,
-                    foto: e.target.result,
+                    foto: URL.createObjectURL(fotoInput.files[0]),
                 };
                 
                 users.push(newUser);
@@ -788,6 +813,11 @@
                 showNotification('Cadastro realizado com sucesso!', 'success');
                 closeModal(document.getElementById('modal-cadastro-prestador'));
                 form.reset();
+                
+                currentUser = newUser;
+                sessionStorage.setItem('conecta_userId', currentUser.id);
+                updateHeaderUI();
+
             };
 
             if (fotoInput.files.length > 0) {
@@ -1064,7 +1094,6 @@
         document.getElementById('form-criar-anuncio').addEventListener('submit', handleCreateAd);
         
         document.querySelectorAll('.modal-backdrop').forEach(modal => {
-            modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal) });
             const closeButton = modal.querySelector('.btn-fechar-modal');
             if (closeButton) closeButton.addEventListener('click', () => closeModal(modal));
         });
@@ -1091,7 +1120,7 @@
         });
         
         document.getElementById('prestador-cep').addEventListener('blur', async (e) => {
-            const cepStatus = document.getElementById('cep-status');
+            const cepStatus = document.getElementById('prestador-cpf-status');
             const result = await fetchCEPData(e.target.value);
             if (result.error) {
                 cepStatus.textContent = result.error;
@@ -1132,17 +1161,17 @@
 
         document.getElementById('prestador-cpf').addEventListener('input', e => {
             const cpfInput = e.target;
-            const cpfStatus = document.getElementById('cpf-status');
+            const cpfStatus = document.getElementById('prestador-cpf-status');
             if (validateCPF(cpfInput.value)) {
                 cpfStatus.textContent = 'CPF válido!';
                 cpfStatus.className = 'text-xs text-green-600';
-                cpfInput.classList.remove('cpf-invalido');
+                cpfInput.classList.remove('input-invalido');
                 cpfInput.classList.add('cpf-valido');
             } else {
                 cpfStatus.textContent = 'CPF inválido.';
                 cpfStatus.className = 'text-xs text-red-600';
                 cpfInput.classList.remove('cpf-valido');
-                cpfInput.classList.add('cpf-invalido');
+                cpfInput.classList.add('input-invalido');
             }
         });
         
@@ -1152,13 +1181,37 @@
             if (validateCPF(cpfInput.value)) {
                 cpfStatus.textContent = 'CPF válido!';
                 cpfStatus.className = 'text-xs text-green-600';
-                cpfInput.classList.remove('cpf-invalido');
+                cpfInput.classList.remove('input-invalido');
                 cpfInput.classList.add('cpf-valido');
             } else {
                 cpfStatus.textContent = 'CPF inválido.';
                 cpfStatus.className = 'text-xs text-red-600';
                 cpfInput.classList.remove('cpf-valido');
-                cpfInput.classList.add('cpf-invalido');
+                cpfInput.classList.add('input-invalido');
+            }
+        });
+        
+        document.getElementById('cliente-nascimento').addEventListener('blur', e => {
+            const birthDateInput = e.target;
+            const birthDateStatus = document.getElementById('cliente-nascimento-status');
+            if(validateAge(birthDateInput.value)) {
+                birthDateStatus.textContent = '';
+                birthDateInput.classList.remove('input-invalido');
+            } else {
+                birthDateStatus.textContent = 'A idade mínima para cadastro é de 15 anos.';
+                birthDateInput.classList.add('input-invalido');
+            }
+        });
+
+        document.getElementById('prestador-nascimento').addEventListener('blur', e => {
+            const birthDateInput = e.target;
+            const birthDateStatus = document.getElementById('prestador-nascimento-status');
+            if(validateAge(birthDateInput.value)) {
+                birthDateStatus.textContent = '';
+                birthDateInput.classList.remove('input-invalido');
+            } else {
+                birthDateStatus.textContent = 'A idade mínima para cadastro é de 15 anos.';
+                birthDateInput.classList.add('input-invalido');
             }
         });
 
