@@ -28,6 +28,10 @@
         .input-invalido {
             border-color: #ef4444; /* red-500 */
         }
+        .input-invalido:focus {
+            border-color: #ef4444;
+            --tw-ring-color: #ef4444;
+        }
         .cpf-valido {
             border-color: #22c55e; /* green-500 */
         }
@@ -57,6 +61,27 @@
         .modal-scrollable::-webkit-scrollbar-track { background: #f1f1f1; }
         .modal-scrollable::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
         .modal-scrollable::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        .rating-stars {
+            display: inline-block;
+            direction: rtl;
+        }
+        .rating-stars input {
+            display: none;
+        }
+        .rating-stars label {
+            color: #d1d5db; /* gray-300 */
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .rating-stars input:checked ~ label,
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label {
+            color: #f59e0b; /* amber-500 */
+        }
+        .error-message {
+            height: 1rem; /* Reserve space to prevent layout shift */
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -90,7 +115,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
                         Criar Anúncio
                     </button>
-                    <div id="perfil-dropdown-container">
+                    <div id="perfil-dropdown-container" class="relative">
                         <img id="header-foto-perfil" src="" alt="Foto do Perfil" class="w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-blue-500">
                         <div id="perfil-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 dropdown-menu">
                             <!-- Conteúdo do menu é dinâmico -->
@@ -150,8 +175,8 @@
                          <option value="100">Até 100 km</option>
                     </select>
                 </div>
-                <div>
-                    <button id="btn-buscar" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center">
+                <div class="lg:col-start-5">
+                    <button id="btn-buscar" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center h-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
                         Buscar
                     </button>
@@ -180,6 +205,9 @@
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter">
             <div class="p-6 border-b flex justify-between items-center">
                 <h3 class="text-xl font-bold text-gray-900">Acessar sua Conta</h3>
+                 <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
             </div>
             <form id="form-login" class="p-8 space-y-6">
                  <div>
@@ -200,14 +228,17 @@
 
     <!-- Modal de CRIAR ANÚNCIO -->
     <div id="modal-criar-anuncio" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
                 <div>
                     <h3 class="text-xl font-bold text-gray-900">Criar Novo Anúncio</h3>
                     <p class="text-sm text-gray-500">Detalhe o serviço que você quer oferecer.</p>
                 </div>
+                 <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
             </div>
-            <form id="form-criar-anuncio" class="p-8 space-y-6">
+            <form id="form-criar-anuncio" class="p-8 space-y-6 overflow-y-auto modal-scrollable flex-grow">
                 <div>
                     <label for="anuncio-titulo" class="block text-sm font-medium text-gray-700">Título do Anúncio</label>
                     <input type="text" id="anuncio-titulo" placeholder="Ex: Promoção de Instalação de Ar Condicionado" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -233,7 +264,7 @@
                     </div>
                 </div>
             </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
                 <button type="submit" form="form-criar-anuncio" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Publicar Anúncio</button>
             </div>
@@ -268,52 +299,61 @@
 
     <!-- Modal de Cadastro do CLIENTE -->
     <div id="modal-cadastro-cliente" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 flex-shrink-0">
                 <div>
                     <h3 class="text-xl font-bold text-gray-900">Cadastro de Cliente</h3>
                     <p class="text-sm text-gray-500">Crie sua conta para contratar e avaliar serviços.</p>
                 </div>
             </div>
-            <form id="form-cadastro-cliente" class="p-8 space-y-6">
+            <form id="form-cadastro-cliente" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow" novalidate>
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                         <div>
                             <label for="cliente-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                            <input type="email" id="cliente-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="email" id="cliente-email" name="cliente-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cliente-email-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
+                            <label for="cliente-email-confirm" class="block text-sm font-medium text-gray-700">Confirmar E-mail</label>
+                            <input type="email" id="cliente-email-confirm" name="cliente-email-confirm" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cliente-email-confirm-error" class="text-xs text-red-600 error-message block"></span>
+                        </div>
+                        <div class="md:col-span-2">
                             <label for="cliente-senha" class="block text-sm font-medium text-gray-700">Senha</label>
-                            <input type="password" id="cliente-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="password" id="cliente-senha" name="cliente-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cliente-senha-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
                 </div>
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                         <div class="md:col-span-2">
                             <label for="cliente-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                            <input type="text" id="cliente-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="cliente-nome" name="cliente-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cliente-nome-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                             <label for="cliente-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-                            <input type="text" id="cliente-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <span id="cliente-cpf-status" class="text-xs mt-1"></span>
+                            <input type="text" id="cliente-cpf" name="cliente-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <span id="cliente-cpf-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                              <label for="cliente-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
-                             <input type="date" id="cliente-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="cliente-nascimento-status" class="text-xs mt-1 text-red-600"></span>
+                             <input type="date" id="cliente-nascimento" name="cliente-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="cliente-nascimento-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
                 </div>
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Seu Endereço</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
                         <div>
                             <label for="cliente-cep" class="block text-sm font-medium text-gray-700">CEP</label>
-                            <input type="text" id="cliente-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="cliente-cep" name="cliente-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="cliente-cep-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                          <div class="md:col-span-2">
                             <label for="cliente-rua" class="block text-sm font-medium text-gray-700">Rua</label>
@@ -321,7 +361,8 @@
                         </div>
                         <div>
                             <label for="cliente-numero" class="block text-sm font-medium text-gray-700">Número</label>
-                            <input type="text" id="cliente-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="cliente-numero" name="cliente-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="cliente-numero-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                             <label for="cliente-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
@@ -338,7 +379,7 @@
                     </div>
                 </div>
             </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
                 <button type="submit" form="form-cadastro-cliente" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
             </div>
@@ -362,57 +403,69 @@
     
     <!-- Modal de Cadastro do PRESTADOR -->
     <div id="modal-cadastro-prestador" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div id="modal-content-prestador" class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+        <div id="modal-content-prestador" class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 flex-shrink-0">
                 <div>
                     <h3 class="text-xl font-bold text-gray-900">Cadastro de Prestador de Serviço</h3>
                     <p class="text-sm text-gray-500">Preencha seus dados para começar a oferecer seus services.</p>
                 </div>
             </div>
-            <form id="form-cadastro-prestador" class="p-8 space-y-6">
-                <!-- Seção Dados Pessoais -->
+            <form id="form-cadastro-prestador" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow" novalidate>
+                <!-- Seção Dados de Acesso -->
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                         <div>
                             <label for="prestador-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                            <input type="email" id="prestador-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="email" id="prestador-email" name="prestador-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-email-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
+                            <label for="prestador-email-confirm" class="block text-sm font-medium text-gray-700">Confirmar E-mail</label>
+                            <input type="email" id="prestador-email-confirm" name="prestador-email-confirm" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-email-confirm-error" class="text-xs text-red-600 error-message block"></span>
+                        </div>
+                        <div class="md:col-span-2">
                             <label for="prestador-senha" class="block text-sm font-medium text-gray-700">Senha</label>
-                            <input type="password" id="prestador-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="password" id="prestador-senha" name="prestador-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-senha-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
                 </div>
+                <!-- Seção Dados Pessoais -->
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                         <div class="md:col-span-2">
                             <label for="prestador-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                            <input type="text" id="prestador-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="prestador-nome" name="prestador-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-nome-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                             <label for="prestador-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-                            <input type="text" id="prestador-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <span id="prestador-cpf-status" class="text-xs mt-1"></span>
+                            <input type="text" id="prestador-cpf" name="prestador-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <span id="prestador-cpf-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                              <label for="prestador-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
-                             <input type="date" id="prestador-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="prestador-nascimento-status" class="text-xs mt-1 text-red-600"></span>
+                             <input type="date" id="prestador-nascimento" name="prestador-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="prestador-nascimento-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                             <label for="prestador-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
-                            <input type="tel" id="prestador-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="tel" id="prestador-telefone" name="prestador-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-telefone-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
                 </div>
+                <!-- Seção Endereço -->
                 <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Endereço de Atendimento</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
                         <div>
                             <label for="prestador-cep" class="block text-sm font-medium text-gray-700">CEP</label>
-                            <input type="text" id="prestador-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="prestador-cep" name="prestador-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-cep-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                          <div class="md:col-span-2">
                             <label for="prestador-rua" class="block text-sm font-medium text-gray-700">Rua</label>
@@ -420,7 +473,8 @@
                         </div>
                         <div>
                             <label for="prestador-numero" class="block text-sm font-medium text-gray-700">Número</label>
-                            <input type="text" id="prestador-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="prestador-numero" name="prestador-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="prestador-numero-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                         <div>
                             <label for="prestador-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
@@ -436,31 +490,34 @@
                         </div>
                     </div>
                 </div>
+                <!-- Seção Perfil e Serviço -->
                  <div>
                     <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Perfil e Serviço</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                          <div class="md:col-span-2">
                              <label for="prestador-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
-                             <input type="text" id="prestador-servico" placeholder="Ex: Eletricista Residencial" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <input type="text" id="prestador-servico" name="prestador-servico" placeholder="Ex: Eletricista Residencial" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="prestador-servico-error" class="text-xs text-red-600 error-message block"></span>
                          </div>
                          <div>
                             <label for="prestador-raio" class="block text-sm font-medium text-gray-700">Raio de Atendimento</label>
                              <select id="prestador-raio" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="5">Até 5 km</option>
-                                <option value="10">Até 10 km</option>
-                                <option value="25">Até 25 km</option>
-                                <option value="50">Até 50 km</option>
-                                <option value="100">Até 100 km</option>
+                                 <option value="5">Até 5 km</option>
+                                 <option value="10">Até 10 km</option>
+                                 <option value="25">Até 25 km</option>
+                                 <option value="50">Até 50 km</option>
+                                 <option value="100">Até 100 km</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Foto de Perfil (Obrigatório)</label>
-                            <input type="file" id="prestador-foto" required accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                            <input type="file" id="prestador-foto" name="prestador-foto" required accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                             <span id="prestador-foto-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
                 </div>
             </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl sticky bottom-0">
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
                 <button type="submit" form="form-cadastro-prestador" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
             </div>
@@ -479,6 +536,24 @@
                 </div>
             </div>
             <div class="p-6 md:p-8" id="perfil-dinamico-conteudo">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal MEUS ANÚNCIOS -->
+    <div id="modal-meus-anuncios" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
+                <h3 class="text-xl font-bold text-gray-900">Meus Anúncios</h3>
+                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div id="meus-anuncios-lista" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow">
+                <!-- Lista de anúncios será inserida aqui -->
+            </div>
+            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
+                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
             </div>
         </div>
     </div>
@@ -528,8 +603,8 @@
              { id: 2, userId: 2, nome: "Fernanda Lima", servico: "Encanadora", localidade: "Rio de Janeiro, RJ", latitude: -22.906847, longitude: -43.172896, raio: 10, avaliacao: 4.9, avaliacoesTotal: 98, telefone: "5521912345678", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", logo: "https://placehold.co/100x100/e0e7ff/4f46e5?text=FL", descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas.", galeria_fotos: ["https://images.unsplash.com/photo-1582881348395-ead5503b2a59?q=80&w=2070&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Beatriz C.", nota: 5, comentario: "A Fernanda é fantástica! Encontrou um vazamento que ninguém mais achava."}]},
         ];
         const initialUsers = [
-             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista' },
-             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora' },
+             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista', cep: '01311-000', telefone: '11987654321', raio: 25 },
+             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora', cep: '20040-004', telefone: '21912345678', raio: 10 },
              { id: 3, nome: "Cliente Teste", email: "cliente@email.com", senha: "123", tipo: "cliente", foto: "https://i.pravatar.cc/150?u=cliente@email.com", cep: "01001-000", rua: "Praça da Sé", bairro: "Sé", cidade: "São Paulo", estado: "SP" }
         ];
 
@@ -620,12 +695,9 @@
                     `;
                 }
                 
-                const logoutButton = document.getElementById('btn-logout-dynamic');
-                if (logoutButton) logoutButton.addEventListener('click', handleLogout);
-
-                const myAdsButton = document.getElementById('btn-meus-anuncios');
-                if (myAdsButton) myAdsButton.addEventListener('click', openMyAdsModal);
-
+                // Add event listeners to dynamically created buttons
+                document.getElementById('btn-logout-dynamic')?.addEventListener('click', handleLogout);
+                document.getElementById('btn-meus-anuncios')?.addEventListener('click', openMyAdsModal);
 
             } else {
                 headerAnonimo.classList.remove('hidden');
@@ -645,11 +717,12 @@
 
             texto.textContent = message;
 
+            content.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
             if (type === 'success') {
-                content.className = 'p-4 rounded-lg shadow-2xl flex items-center gap-3 bg-green-500 text-white';
+                content.classList.add('bg-green-500', 'text-white');
                 icone.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg>`;
             } else { 
-                content.className = 'p-4 rounded-lg shadow-2xl flex items-center gap-3 bg-red-500 text-white';
+                content.classList.add('bg-red-500', 'text-white');
                 icone.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z M8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" /></svg>`;
             }
 
@@ -679,6 +752,7 @@
         }
 
         function validateAge(birthDateString) {
+            if (!birthDateString) return false;
             const birthDate = new Date(birthDateString);
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
@@ -689,55 +763,78 @@
             return age >= 15;
         }
 
+        function clearFormErrors(form) {
+            form.querySelectorAll('.error-message').forEach(span => span.textContent = '');
+            form.querySelectorAll('.input-invalido').forEach(input => input.classList.remove('input-invalido'));
+        }
+
+        function setFieldError(form, fieldName, message) {
+            const input = form.elements[fieldName];
+            const errorSpan = document.getElementById(`${fieldName}-error`);
+            if (input) input.classList.add('input-invalido');
+            if (errorSpan) errorSpan.textContent = message;
+        }
+
         function handleRegisterCliente(event) {
             event.preventDefault();
             const form = event.target;
-            const email = form['cliente-email'].value;
-            const cpfInput = form['cliente-cpf'];
-            const birthDateInput = form['cliente-nascimento'];
+            clearFormErrors(form);
+            let errors = {};
             
-            let isValid = true;
-            form.querySelectorAll('[required]').forEach(input => {
-                if (!input.value) { isValid = false; input.classList.add('input-invalido'); } 
-                else { input.classList.remove('input-invalido'); }
-            });
+            // Validation logic
+            const email = form.elements['cliente-email'].value;
+            const emailConfirm = form.elements['cliente-email-confirm'].value;
+
+            if (!form.elements['cliente-nome'].value) errors['cliente-nome'] = 'O campo Nome Completo é obrigatório.';
+            if (!email) {
+                errors['cliente-email'] = 'O campo E-mail é obrigatório.';
+            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+                errors['cliente-email'] = 'Formato de e-mail inválido.';
+            } else if (users.some(u => u.email === email)) {
+                errors['cliente-email'] = 'Este e-mail já está em uso.';
+            }
             
-            if (!validateCPF(cpfInput.value)) {
-                showNotification('CPF inválido.', 'error');
-                cpfInput.classList.add('input-invalido');
-                isValid = false;
+            if (!emailConfirm) {
+                errors['cliente-email-confirm'] = 'A confirmação de e-mail é obrigatória.';
+            } else if (email !== emailConfirm) {
+                errors['cliente-email-confirm'] = 'Os e-mails não coincidem.';
             }
 
-             if(!validateAge(birthDateInput.value)) {
-                showNotification('Você precisa ter pelo menos 15 anos para se cadastrar.', 'error');
-                birthDateInput.classList.add('input-invalido');
-                isValid = false;
+            if (!form.elements['cliente-senha'].value) {
+                errors['cliente-senha'] = 'O campo Senha é obrigatório.';
+            } else if (form.elements['cliente-senha'].value.length < 8) {
+                errors['cliente-senha'] = 'A senha deve ter no mínimo 8 caracteres.';
             }
 
-            if (!isValid) {
-                showNotification('Por favor, corrija os campos marcados.', 'error');
-                return;
-            }
+            if (!form.elements['cliente-cpf'].value) errors['cliente-cpf'] = 'O campo CPF é obrigatório.';
+            else if (!validateCPF(form.elements['cliente-cpf'].value)) errors['cliente-cpf'] = 'CPF inválido.';
+            if (!form.elements['cliente-nascimento'].value) errors['cliente-nascimento'] = 'O campo Data de Nascimento é obrigatório.';
+            else if (!validateAge(form.elements['cliente-nascimento'].value)) errors['cliente-nascimento'] = 'A idade mínima para cadastro é de 15 anos.';
+            if (!form.elements['cliente-cep'].value) errors['cliente-cep'] = 'O campo CEP é obrigatório.';
+            if (!form.elements['cliente-numero'].value) errors['cliente-numero'] = 'O campo Número é obrigatório.';
 
-            if (users.find(u => u.email === email)) {
-                showNotification('Este e-mail já está cadastrado.', 'error');
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([fieldName, message]) => {
+                    setFieldError(form, fieldName, message);
+                });
+                showNotification('Por favor, corrija os campos indicados.', 'error');
                 return;
             }
             
             const newUser = {
                 id: Date.now(),
                 tipo: 'cliente',
-                email: email,
-                senha: form['cliente-senha'].value,
-                nome: form['cliente-nome'].value,
-                cpf: cpfInput.value,
-                nascimento: birthDateInput.value,
-                cep: form['cliente-cep'].value,
-                rua: form['cliente-rua'].value,
-                bairro: form['cliente-bairro'].value,
-                cidade: form['cliente-cidade'].value,
-                estado: form['cliente-estado'].value,
-                foto: `https://i.pravatar.cc/150?u=${email}`
+                email: form.elements['cliente-email'].value,
+                senha: form.elements['cliente-senha'].value,
+                nome: form.elements['cliente-nome'].value,
+                cpf: form.elements['cliente-cpf'].value,
+                nascimento: form.elements['cliente-nascimento'].value,
+                cep: form.elements['cliente-cep'].value,
+                rua: form.elements['cliente-rua'].value,
+                bairro: form.elements['cliente-bairro'].value,
+                cidade: form.elements['cliente-cidade'].value,
+                estado: form.elements['cliente-estado'].value,
+                foto: `https://i.pravatar.cc/150?u=${form.elements['cliente-email'].value}`
             };
             
             users.push(newUser);
@@ -746,6 +843,7 @@
             showNotification('Cadastro de cliente realizado com sucesso!', 'success');
             closeModal(document.getElementById('modal-cadastro-cliente'));
             form.reset();
+            clearFormErrors(form);
             
             currentUser = newUser;
             sessionStorage.setItem('conecta_userId', currentUser.id);
@@ -753,58 +851,72 @@
             populateSearchFiltersForClient();
         }
 
-        function handleRegisterPrestador(event) {
+        async function handleRegisterPrestador(event) {
             event.preventDefault();
             const form = event.target;
-            const email = form['prestador-email'].value;
-            const cpfInput = form['prestador-cpf'];
-            const birthDateInput = form['prestador-nascimento'];
+            clearFormErrors(form);
+            let errors = {};
 
-            let isValid = true;
-            form.querySelectorAll('[required]').forEach(input => {
-                if (!input.value) { isValid = false; input.classList.add('input-invalido'); } 
-                else { input.classList.remove('input-invalido'); }
-            });
-            
-            if (!validateCPF(cpfInput.value)) {
-                showNotification('CPF inválido.', 'error');
-                cpfInput.classList.add('input-invalido');
-                isValid = false;
+            // Validation logic
+            const email = form.elements['prestador-email'].value;
+            const emailConfirm = form.elements['prestador-email-confirm'].value;
+
+            if (!form.elements['prestador-nome'].value) errors['prestador-nome'] = 'O campo Nome Completo é obrigatório.';
+            if (!email) {
+                errors['prestador-email'] = 'O campo E-mail é obrigatório.';
+            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+                errors['prestador-email'] = 'Formato de e-mail inválido.';
+            } else if (users.some(u => u.email === email)) {
+                errors['prestador-email'] = 'Este e-mail já está em uso.';
             }
 
-             if(!validateAge(birthDateInput.value)) {
-                showNotification('Você precisa ter pelo menos 15 anos para se cadastrar.', 'error');
-                birthDateInput.classList.add('input-invalido');
-                isValid = false;
+            if (!emailConfirm) {
+                errors['prestador-email-confirm'] = 'A confirmação de e-mail é obrigatória.';
+            } else if (email !== emailConfirm) {
+                errors['prestador-email-confirm'] = 'Os e-mails não coincidem.';
             }
 
-            if (!isValid) {
-                showNotification('Por favor, corrija os campos marcados.', 'error');
+            if (!form.elements['prestador-senha'].value) {
+                errors['prestador-senha'] = 'O campo Senha é obrigatório.';
+            } else if (form.elements['prestador-senha'].value.length < 8) {
+                errors['prestador-senha'] = 'A senha deve ter no mínimo 8 caracteres.';
+            }
+
+            if (!form.elements['prestador-cpf'].value) errors['prestador-cpf'] = 'O campo CPF é obrigatório.';
+            else if (!validateCPF(form.elements['prestador-cpf'].value)) errors['prestador-cpf'] = 'CPF inválido.';
+            if (!form.elements['prestador-nascimento'].value) errors['prestador-nascimento'] = 'O campo Data de Nascimento é obrigatório.';
+            else if (!validateAge(form.elements['prestador-nascimento'].value)) errors['prestador-nascimento'] = 'A idade mínima para cadastro é de 15 anos.';
+            if (!form.elements['prestador-telefone'].value) errors['prestador-telefone'] = 'O campo Telefone é obrigatório.';
+            if (!form.elements['prestador-cep'].value) errors['prestador-cep'] = 'O campo CEP é obrigatório.';
+            if (!form.elements['prestador-numero'].value) errors['prestador-numero'] = 'O campo Número é obrigatório.';
+            if (!form.elements['prestador-servico'].value) errors['prestador-servico'] = 'O campo Serviço Prestado é obrigatório.';
+            if (form.elements['prestador-foto'].files.length === 0) errors['prestador-foto'] = 'A Foto de Perfil é obrigatória.';
+
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([fieldName, message]) => {
+                    setFieldError(form, fieldName, message);
+                });
+                showNotification('Por favor, corrija os campos indicados.', 'error');
                 return;
             }
 
-            if (users.find(u => u.email === email)) {
-                showNotification('Este e-mail já está cadastrado.', 'error');
-                return;
-            }
-            
-            const fotoInput = form['prestador-foto'];
+            const fotoInput = form.elements['prestador-foto'];
             const reader = new FileReader();
-
+            
             reader.onload = function(e) {
                 const newUser = {
                     id: Date.now(),
                     tipo: 'prestador',
-                    email: email,
-                    senha: form['prestador-senha'].value,
-                    nome: form['prestador-nome'].value,
-                    cpf: cpfInput.value,
-                    nascimento: birthDateInput.value,
-                    telefone: form['prestador-telefone'].value,
-                    cep: form['prestador-cep'].value,
-                    servicoPrincipal: form['prestador-servico'].value,
-                    raio: form['prestador-raio'].value,
-                    foto: URL.createObjectURL(fotoInput.files[0]),
+                    email: form.elements['prestador-email'].value,
+                    senha: form.elements['prestador-senha'].value,
+                    nome: form.elements['prestador-nome'].value,
+                    cpf: form.elements['prestador-cpf'].value,
+                    nascimento: form.elements['prestador-nascimento'].value,
+                    telefone: form.elements['prestador-telefone'].value,
+                    cep: form.elements['prestador-cep'].value,
+                    servicoPrincipal: form.elements['prestador-servico'].value,
+                    raio: form.elements['prestador-raio'].value,
+                    foto: e.target.result,
                 };
                 
                 users.push(newUser);
@@ -813,18 +925,14 @@
                 showNotification('Cadastro realizado com sucesso!', 'success');
                 closeModal(document.getElementById('modal-cadastro-prestador'));
                 form.reset();
+                clearFormErrors(form);
                 
                 currentUser = newUser;
                 sessionStorage.setItem('conecta_userId', currentUser.id);
                 updateHeaderUI();
-
             };
 
-            if (fotoInput.files.length > 0) {
-                 reader.readAsDataURL(fotoInput.files[0]);
-            } else {
-                 showNotification('Por favor, adicione uma foto de perfil.', 'error');
-            }
+            reader.readAsDataURL(fotoInput.files[0]);
         }
         
         async function handleLogin(event) {
@@ -847,14 +955,17 @@
             }
         }
 
-        function handleLogout() {
+        function handleLogout(e) {
+            e.preventDefault();
             currentUser = null;
             sessionStorage.removeItem('conecta_userId');
             updateHeaderUI();
-            ['search-cep', 'search-rua', 'search-bairro', 'search-cidade', 'search-estado'].forEach(id => document.getElementById(id).value = '');
+            ['search-cep', 'search-rua', 'search-bairro', 'search-cidade', 'search-estado', 'tipo-servico', 'search-numero'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('raio-atendimento').value = "";
+            showNotification('Você saiu da sua conta.', 'success');
         }
 
-        function handleCreateAd(event) {
+        async function handleCreateAd(event) {
             event.preventDefault();
             const form = event.target;
             const fotosInput = form['anuncio-fotos'];
@@ -870,9 +981,10 @@
                 return;
             }
 
-            if (fotosInput.files.length === 0) {
-                 showNotification('Adicione pelo menos uma foto ao anúncio.', 'error');
-                 return;
+            const cepResult = await fetchCEPData(currentUser.cep);
+            if (cepResult.error) {
+                showNotification('Seu CEP de cadastro é inválido. Atualize seu perfil.', 'error');
+                return;
             }
 
             const newProviderAd = {
@@ -880,7 +992,9 @@
                 userId: currentUser.id,
                 nome: currentUser.nome,
                 servico: form['anuncio-titulo'].value,
-                localidade: "Localidade (do perfil)",
+                localidade: `${cepResult.data.localidade}, ${cepResult.data.uf}`,
+                latitude: cepResult.data.lat, // Supondo que a API retorne lat/lon
+                longitude: cepResult.data.lon,
                 raio: currentUser.raio,
                 avaliacao: 0,
                 avaliacoesTotal: 0,
@@ -893,8 +1007,18 @@
             };
 
             const files = Array.from(fotosInput.files);
-            let processedFiles = 0;
+            if (files.length === 0) {
+                 serviceProviders.push(newProviderAd);
+                 saveProviders();
+                 displayServiceCards(serviceProviders);
+                 showNotification('Anúncio publicado com sucesso!', 'success');
+                 closeModal(document.getElementById('modal-criar-anuncio'));
+                 form.reset();
+                 document.getElementById('fotos-preview').innerHTML = '';
+                 return;
+            }
 
+            let processedFiles = 0;
             files.forEach(file => {
                  const reader = new FileReader();
                  reader.onload = function(e) {
@@ -958,18 +1082,31 @@
         }
 
         async function handleSearch() {
-            if (!currentUser) {
+            const cepInput = document.getElementById('search-cep').value;
+            const radiusValue = document.getElementById('raio-atendimento').value;
+
+            if ((cepInput || radiusValue) && !currentUser) {
                 openModal(document.getElementById('modal-login-necessario'));
                 return;
             }
 
             let filteredProviders = [...serviceProviders];
+            let userLocation = null;
+
+            if (cepInput) {
+                const cepResult = await fetchCEPData(cepInput);
+                if (cepResult.data) {
+                    // Mocking lat/lon for ViaCEP as it doesn't provide them
+                    // A real application would use another API to geocode the address
+                    userLocation = { lat: -23.5505, lon: -46.6333 }; 
+                } else {
+                    showNotification('CEP de busca inválido.', 'error');
+                    return;
+                }
+            }
 
             const serviceQuery = document.getElementById('tipo-servico').value.toLowerCase();
             const cityQuery = document.getElementById('search-cidade').value.toLowerCase();
-            const radiusValue = document.getElementById('raio-atendimento').value;
-            
-            const userLocation = { lat: -23.550520, lon: -46.633308 }; 
             
             if (serviceQuery) {
                 filteredProviders = filteredProviders.filter(p => p.servico.toLowerCase().includes(serviceQuery));
@@ -979,13 +1116,14 @@
                 filteredProviders = filteredProviders.filter(p => p.localidade.toLowerCase().includes(cityQuery));
             }
 
-            if (radiusValue) {
+            if (radiusValue && userLocation) {
                 const radiusKm = parseInt(radiusValue);
                 filteredProviders = filteredProviders.filter(p => {
                     if (p.latitude && p.longitude) {
                         const distance = calculateDistance(userLocation.lat, userLocation.lon, p.latitude, p.longitude);
                         return distance <= radiusKm;
                     }
+                    // If provider has no lat/lon, they can't be filtered by radius
                     return false;
                 });
             }
@@ -996,11 +1134,17 @@
         function handleSiteRating(event) {
             event.preventDefault();
             const form = event.target;
+            const rating = form['site-rating'].value;
+            if (!rating) {
+                showNotification('Por favor, selecione uma nota.', 'error');
+                return;
+            }
             console.log("Avaliação do site enviada:", {
-                nota: form['site-rating'].value,
+                nota: rating,
                 comentario: form['site-avaliacao-comentario'].value
             });
             closeModal(document.getElementById('modal-avaliacao-site'));
+            form.reset();
             showNotification("Agradecemos seu feedback!", "success");
         }
         
@@ -1012,7 +1156,7 @@
             for (let i = 0; i < fullStars; i++) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
             if (halfStar) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118L10 15.347V2.927z"></path></svg>`; }
             for (let i = 0; i < emptyStars; i++) { stars += `<svg class="${size} text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
-            return stars;
+            return `<div class="flex items-center">${stars}</div>`;
         }
 
         function displayServiceCards(providers) {
@@ -1039,9 +1183,7 @@
                     </div>
                     <div class="p-4 bg-gray-50 border-t">
                         <div class="flex items-center justify-between">
-                            <div class="card-rating" data-provider-id="${provider.id}">
-                                <!-- Stars will be generated by JS -->
-                            </div>
+                            ${generateStars(provider.avaliacao)}
                             <span class="text-gray-600 text-sm font-medium" id="rating-text-${provider.id}">${provider.avaliacao.toFixed(1)} (${provider.avaliacoesTotal})</span>
                         </div>
                     </div>
@@ -1051,11 +1193,11 @@
         }
         
         function openProfileModal(provider) {
-             const modalPerfil = document.getElementById('modal-perfil-prestador');
+            const modalPerfil = document.getElementById('modal-perfil-prestador');
             if (!modalPerfil || !provider) return;
             const conteudoPerfil = document.getElementById('perfil-dinamico-conteudo');
             
-            conteudoPerfil.innerHTML = `<div class="flex flex-col md:flex-row items-start gap-6 mb-8"><img class="w-32 h-32 rounded-full border-4 border-white shadow-lg flex-shrink-0" src="${provider.foto}" alt="Foto do prestador"><div class="flex-grow"><div class="flex items-center gap-4"><h2 class="text-3xl font-bold text-gray-900">${provider.nome}</h2>${provider.logo ? `<img class="w-12 h-12 rounded-lg" src="${provider.logo}" alt="Logo">` : ''}</div><p class="text-lg font-medium text-blue-600">${provider.servico}</p><div class="flex items-center mt-2">${generateStars(provider.avaliacao, 'w-5 h-5')}<span class="ml-2 text-gray-600 text-sm font-medium">${provider.avaliacao.toFixed(1)}</span><span class="ml-1 text-gray-500 text-sm">(${provider.avaliacoesTotal} avaliações)</span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><h4 class="text-lg font-semibold mb-2 text-gray-800">Sobre o Profissional</h4><p class="text-gray-600 leading-relaxed">${provider.descricao_longa}</p></div><div><h4 class="text-lg font-semibold mb-2 text-gray-800">Localização</h4><p class="text-gray-600 flex items-center gap-2"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${provider.localidade}</p></div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">Galeria de Trabalhos</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${(provider.galeria_fotos || []).map(fotoUrl => `<img src="${fotoUrl}" alt="Foto do trabalho" class="w-full h-32 object-cover rounded-lg">`).join('')}</div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">O que os clientes dizem</h4><div class="space-y-4">${(provider.avaliacoes_detalhadas || []).map(aval => `<div class="bg-white p-4 rounded-lg border"><div class="flex items-center mb-2">${generateStars(aval.nota)}<p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p></div><p class="text-gray-600">"${aval.comentario}"</p></div>`).join('')}</div></div><div class="p-6 border-t bg-gray-100 flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 -m-8 mt-8"><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Iniciar Chat</button><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Solicitar Orçamento</button></div>`;
+            conteudoPerfil.innerHTML = `<div class="flex flex-col md:flex-row items-start gap-6 mb-8"><img class="w-32 h-32 rounded-full border-4 border-white shadow-lg flex-shrink-0 object-cover" src="${provider.foto}" alt="Foto do prestador"><div class="flex-grow"><div class="flex items-center gap-4"><h2 class="text-3xl font-bold text-gray-900">${provider.nome}</h2>${provider.logo ? `<img class="w-12 h-12 rounded-lg" src="${provider.logo}" alt="Logo">` : ''}</div><p class="text-lg font-medium text-blue-600">${provider.servico}</p><div class="flex items-center mt-2">${generateStars(provider.avaliacao, 'w-5 h-5')}<span class="ml-2 text-gray-600 text-sm font-medium">${provider.avaliacao.toFixed(1)}</span><span class="ml-1 text-gray-500 text-sm">(${provider.avaliacoesTotal} avaliações)</span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><h4 class="text-lg font-semibold mb-2 text-gray-800">Sobre o Profissional</h4><p class="text-gray-600 leading-relaxed">${provider.descricao_longa}</p></div><div><h4 class="text-lg font-semibold mb-2 text-gray-800">Localização</h4><p class="text-gray-600 flex items-center gap-2"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${provider.localidade}</p></div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">Galeria de Trabalhos</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${(provider.galeria_fotos || []).map(fotoUrl => `<img src="${fotoUrl}" alt="Foto do trabalho" class="w-full h-32 object-cover rounded-lg">`).join('')}</div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">O que os clientes dizem</h4><div class="space-y-4">${(provider.avaliacoes_detalhadas || []).map(aval => `<div class="bg-white p-4 rounded-lg border"><div class="flex items-center mb-2">${generateStars(aval.nota)}<p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p></div><p class="text-gray-600">"${aval.comentario}"</p></div>`).join('') || '<p class="text-gray-500">Nenhuma avaliação ainda.</p>'}</div></div><div class="p-6 border-t bg-gray-100 flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 -m-8 mt-8"><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Iniciar Chat</button><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Solicitar Orçamento</button></div>`;
             openModal(document.getElementById('modal-perfil-prestador'));
             document.getElementById('modal-perfil-content').scrollTop = 0;
         }
@@ -1094,8 +1236,16 @@
         document.getElementById('form-criar-anuncio').addEventListener('submit', handleCreateAd);
         
         document.querySelectorAll('.modal-backdrop').forEach(modal => {
-            const closeButton = modal.querySelector('.btn-fechar-modal');
-            if (closeButton) closeButton.addEventListener('click', () => closeModal(modal));
+            modal.addEventListener('click', (e) => {
+                // Prevent closing on backdrop click for registration modals
+                const isCadastroModal = modal.id === 'modal-cadastro-cliente' || modal.id === 'modal-cadastro-prestador';
+                if (e.target === modal && !isCadastroModal) {
+                    closeModal(modal);
+                }
+            });
+            modal.querySelectorAll('.btn-fechar-modal').forEach(button => {
+                 button.addEventListener('click', () => closeModal(modal));
+            });
         });
 
         document.getElementById('btn-abrir-escolha').addEventListener('click', () => openModal(document.getElementById('modal-escolha-cadastro')));
@@ -1114,106 +1264,46 @@
             }
         });
 
+        document.getElementById('perfil-dropdown-container').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            document.getElementById('perfil-dropdown-menu').classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+             const dropdownContainer = document.getElementById('perfil-dropdown-container');
+             if (!dropdownContainer.contains(e.target)) {
+                document.getElementById('perfil-dropdown-menu').classList.add('hidden');
+             }
+        });
+
         document.getElementById('btn-ir-login').addEventListener('click', () => {
             closeModal(document.getElementById('modal-login-necessario'));
             setTimeout(() => openModal(document.getElementById('modal-login')), 300);
         });
         
-        document.getElementById('prestador-cep').addEventListener('blur', async (e) => {
-            const cepStatus = document.getElementById('prestador-cpf-status');
-            const result = await fetchCEPData(e.target.value);
-            if (result.error) {
-                cepStatus.textContent = result.error;
-                cepStatus.className = 'text-xs mt-1 text-red-600';
-            } else {
-                const { data } = result;
-                document.getElementById('prestador-rua').value = data.logradouro;
-                document.getElementById('prestador-bairro').value = data.bairro;
-                document.getElementById('prestador-cidade').value = data.localidade;
-                document.getElementById('prestador-estado').value = data.uf;
-                cepStatus.textContent = 'Endereço preenchido!';
-                cepStatus.className = 'text-xs mt-1 text-green-600';
-            }
-        });
+        const setupCepListener = (cepId, ruaId, bairroId, cidadeId, estadoId) => {
+            document.getElementById(cepId).addEventListener('blur', async (e) => {
+                const result = await fetchCEPData(e.target.value);
+                const ruaEl = document.getElementById(ruaId);
+                const bairroEl = document.getElementById(bairroId);
+                const cidadeEl = document.getElementById(cidadeId);
+                const estadoEl = document.getElementById(estadoId);
 
-        document.getElementById('cliente-cep').addEventListener('blur', async (e) => {
-            const result = await fetchCEPData(e.target.value);
-            if(result.data) {
-                document.getElementById('cliente-rua').value = result.data.logradouro;
-                document.getElementById('cliente-bairro').value = result.data.bairro;
-                document.getElementById('cliente-cidade').value = result.data.localidade;
-                document.getElementById('cliente-estado').value = result.data.uf;
-            }
-        });
+                if (result.data) {
+                    ruaEl.value = result.data.logradouro || '';
+                    bairroEl.value = result.data.bairro || '';
+                    cidadeEl.value = result.data.localidade || '';
+                    estadoEl.value = result.data.uf || '';
+                } else {
+                    [ruaEl, bairroEl, cidadeEl, estadoEl].forEach(el => el.value = '');
+                    if (cepId !== 'search-cep') showNotification(result.error, 'error');
+                }
+            });
+        };
 
-        document.getElementById('search-cep').addEventListener('blur', async (e) => {
-            const result = await fetchCEPData(e.target.value);
-            if (result.data) {
-                const { data } = result;
-                document.getElementById('search-rua').value = data.logradouro;
-                document.getElementById('search-bairro').value = data.bairro;
-                document.getElementById('search-cidade').value = data.localidade;
-                document.getElementById('search-estado').value = data.uf;
-            } else {
-                ['search-rua', 'search-bairro', 'search-cidade', 'search-estado'].forEach(id => document.getElementById(id).value = '');
-            }
-        });
-
-        document.getElementById('prestador-cpf').addEventListener('input', e => {
-            const cpfInput = e.target;
-            const cpfStatus = document.getElementById('prestador-cpf-status');
-            if (validateCPF(cpfInput.value)) {
-                cpfStatus.textContent = 'CPF válido!';
-                cpfStatus.className = 'text-xs text-green-600';
-                cpfInput.classList.remove('input-invalido');
-                cpfInput.classList.add('cpf-valido');
-            } else {
-                cpfStatus.textContent = 'CPF inválido.';
-                cpfStatus.className = 'text-xs text-red-600';
-                cpfInput.classList.remove('cpf-valido');
-                cpfInput.classList.add('input-invalido');
-            }
-        });
-        
-        document.getElementById('cliente-cpf').addEventListener('input', e => {
-            const cpfInput = e.target;
-            const cpfStatus = document.getElementById('cliente-cpf-status');
-            if (validateCPF(cpfInput.value)) {
-                cpfStatus.textContent = 'CPF válido!';
-                cpfStatus.className = 'text-xs text-green-600';
-                cpfInput.classList.remove('input-invalido');
-                cpfInput.classList.add('cpf-valido');
-            } else {
-                cpfStatus.textContent = 'CPF inválido.';
-                cpfStatus.className = 'text-xs text-red-600';
-                cpfInput.classList.remove('cpf-valido');
-                cpfInput.classList.add('input-invalido');
-            }
-        });
-        
-        document.getElementById('cliente-nascimento').addEventListener('blur', e => {
-            const birthDateInput = e.target;
-            const birthDateStatus = document.getElementById('cliente-nascimento-status');
-            if(validateAge(birthDateInput.value)) {
-                birthDateStatus.textContent = '';
-                birthDateInput.classList.remove('input-invalido');
-            } else {
-                birthDateStatus.textContent = 'A idade mínima para cadastro é de 15 anos.';
-                birthDateInput.classList.add('input-invalido');
-            }
-        });
-
-        document.getElementById('prestador-nascimento').addEventListener('blur', e => {
-            const birthDateInput = e.target;
-            const birthDateStatus = document.getElementById('prestador-nascimento-status');
-            if(validateAge(birthDateInput.value)) {
-                birthDateStatus.textContent = '';
-                birthDateInput.classList.remove('input-invalido');
-            } else {
-                birthDateStatus.textContent = 'A idade mínima para cadastro é de 15 anos.';
-                birthDateInput.classList.add('input-invalido');
-            }
-        });
+        setupCepListener('prestador-cep', 'prestador-rua', 'prestador-bairro', 'prestador-cidade', 'prestador-estado');
+        setupCepListener('cliente-cep', 'cliente-rua', 'cliente-bairro', 'cliente-cidade', 'cliente-estado');
+        setupCepListener('search-cep', 'search-rua', 'search-bairro', 'search-cidade', 'search-estado');
 
         document.getElementById('anuncio-fotos').addEventListener('change', function(event) {
             const previewContainer = document.getElementById('fotos-preview');
@@ -1248,16 +1338,12 @@
         
         document.getElementById('btn-buscar').addEventListener('click', handleSearch);
         
-        const formAvaliacaoSite = document.getElementById('form-avaliacao-site');
-        if (formAvaliacaoSite) {
-            formAvaliacaoSite.addEventListener('submit', handleSiteRating);
-        }
-
-        const btnAbrirAvaliacaoSite = document.getElementById('btn-abrir-avaliacao-site');
-        if(btnAbrirAvaliacaoSite) {
-             btnAbrirAvaliacaoSite.addEventListener('click', () => openModal(document.getElementById('modal-avaliacao-site')));
-        }
-       
+        document.getElementById('form-avaliacao-site')?.addEventListener('submit', handleSiteRating);
+        document.getElementById('btn-abrir-avaliacao-site')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal(document.getElementById('modal-avaliacao-site'))
+        });
+        
         // --- CHAMADA INICIAL ---
         initializeData();
         checkSession();
