@@ -102,6 +102,11 @@
                     <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Sobre Nós</a>
                 </div>
 
+                <!-- Real-time Clock -->
+                <div class="hidden sm:block text-sm font-medium text-gray-600">
+                    <span id="real-time-clock"></span>
+                </div>
+
                 <!-- Botões de Ação (Estado Deslogado) -->
                 <div id="header-anonimo" class="flex items-center space-x-2">
                     <button id="btn-abrir-login" class="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Login</button>
@@ -234,9 +239,6 @@
                     <h3 class="text-xl font-bold text-gray-900">Criar Novo Anúncio</h3>
                     <p class="text-sm text-gray-500">Detalhe o serviço que você quer oferecer.</p>
                 </div>
-                 <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             <form id="form-criar-anuncio" class="p-8 space-y-6 overflow-y-auto modal-scrollable flex-grow">
                 <div>
@@ -540,20 +542,18 @@
         </div>
     </div>
 
-    <!-- Modal MEUS ANÚNCIOS -->
-    <div id="modal-meus-anuncios" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
+    <!-- Modal EDITAR PERFIL -->
+    <div id="modal-editar-perfil" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
             <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
-                <h3 class="text-xl font-bold text-gray-900">Meus Anúncios</h3>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                </button>
+                <h3 class="text-xl font-bold text-gray-900">Editar Perfil</h3>
             </div>
-            <div id="meus-anuncios-lista" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow">
-                <!-- Lista de anúncios será inserida aqui -->
+            <div id="editar-perfil-conteudo" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow">
+                <!-- Conteúdo do formulário de edição será inserido aqui pelo JS -->
             </div>
             <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
-                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
+                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                 <button type="submit" id="btn-salvar-perfil" form="form-editar-perfil" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -679,7 +679,7 @@
                     greetingMessage.classList.remove('hidden');
                     btnAbrirAnuncio.classList.add('hidden');
                     perfilDropdownMenu.innerHTML = `
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar Perfil</a>
+                        <a href="#" id="btn-editar-perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar Perfil</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preferências</a>
                         <div class="border-t border-gray-100 my-1"></div>
                         <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
@@ -688,8 +688,7 @@
                     greetingMessage.classList.add('hidden');
                     btnAbrirAnuncio.classList.remove('hidden');
                     perfilDropdownMenu.innerHTML = `
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
-                        <a href="#" id="btn-meus-anuncios" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meus Anúncios</a>
+                        <a href="#" id="btn-editar-perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
                         <div class="border-t border-gray-100 my-1"></div>
                         <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
                     `;
@@ -697,7 +696,7 @@
                 
                 // Add event listeners to dynamically created buttons
                 document.getElementById('btn-logout-dynamic')?.addEventListener('click', handleLogout);
-                document.getElementById('btn-meus-anuncios')?.addEventListener('click', openMyAdsModal);
+                document.getElementById('btn-editar-perfil')?.addEventListener('click', openEditProfileModal);
 
             } else {
                 headerAnonimo.classList.remove('hidden');
@@ -782,10 +781,16 @@
             let errors = {};
             
             // Validation logic
+            const nomeCliente = form.elements['cliente-nome'].value.trim();
             const email = form.elements['cliente-email'].value;
             const emailConfirm = form.elements['cliente-email-confirm'].value;
 
-            if (!form.elements['cliente-nome'].value) errors['cliente-nome'] = 'O campo Nome Completo é obrigatório.';
+            if (!nomeCliente) {
+                errors['cliente-nome'] = 'O campo Nome Completo é obrigatório.';
+            } else if (nomeCliente.split(' ').length < 2) {
+                errors['cliente-nome'] = 'Por favor, insira seu nome e sobrenome.';
+            }
+
             if (!email) {
                 errors['cliente-email'] = 'O campo E-mail é obrigatório.';
             } else if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -858,10 +863,16 @@
             let errors = {};
 
             // Validation logic
+            const nomePrestador = form.elements['prestador-nome'].value.trim();
             const email = form.elements['prestador-email'].value;
             const emailConfirm = form.elements['prestador-email-confirm'].value;
 
-            if (!form.elements['prestador-nome'].value) errors['prestador-nome'] = 'O campo Nome Completo é obrigatório.';
+            if (!nomePrestador) {
+                errors['prestador-nome'] = 'O campo Nome Completo é obrigatório.';
+            } else if (nomePrestador.split(' ').length < 2) {
+                errors['prestador-nome'] = 'Por favor, insira seu nome e sobrenome.';
+            }
+
             if (!email) {
                 errors['prestador-email'] = 'O campo E-mail é obrigatório.';
             } else if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -1202,28 +1213,177 @@
             document.getElementById('modal-perfil-content').scrollTop = 0;
         }
 
-        function openMyAdsModal() {
-            const modal = document.getElementById('modal-meus-anuncios');
-            const listContainer = document.getElementById('meus-anuncios-lista');
-            const myAds = serviceProviders.filter(ad => ad.userId === currentUser.id);
+        function openEditProfileModal() {
+            const modal = document.getElementById('modal-editar-perfil');
+            const content = document.getElementById('editar-perfil-conteudo');
+            if (!currentUser) return;
 
-            if (myAds.length === 0) {
-                listContainer.innerHTML = `<p class="text-gray-500 text-center">Você ainda não criou nenhum anúncio.</p>`;
-            } else {
-                listContainer.innerHTML = myAds.map(ad => `
-                    <div class="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
+            const isProvider = currentUser.tipo === 'prestador';
+            
+            const providerFields = isProvider ? `
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Profissionais</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <h4 class="font-semibold">${ad.servico}</h4>
-                            <p class="text-sm text-gray-600">${ad.descricao_longa.substring(0, 50)}...</p>
+                            <label for="edit-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
+                            <input type="tel" id="edit-telefone" name="edit-telefone" value="${currentUser.telefone || ''}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <span id="edit-telefone-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
-                        <div class="flex gap-2">
-                            <button class="text-sm text-blue-600 hover:underline">Editar</button>
-                            <button class="text-sm text-red-600 hover:underline">Excluir</button>
+                        <div>
+                            <label for="edit-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
+                            <input type="text" id="edit-servico" name="edit-servico" value="${currentUser.servicoPrincipal || ''}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                             <span id="edit-servico-error" class="text-xs text-red-600 error-message block"></span>
                         </div>
                     </div>
-                `).join('');
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Minhas Avaliações</h4>
+                    <div id="provider-reviews" class="space-y-4">
+                        <!-- Avaliações serão inseridas aqui -->
+                    </div>
+                </div>
+            ` : '';
+
+            content.innerHTML = `
+                <form id="form-editar-perfil" class="space-y-4" novalidate>
+                     <div>
+                        <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Foto de Perfil</h4>
+                        <div class="flex items-center gap-4">
+                            <img id="edit-foto-preview" src="${currentUser.foto}" alt="Foto de Perfil" class="w-24 h-24 rounded-full object-cover">
+                            <div>
+                                <label for="edit-foto" class="block text-sm font-medium text-gray-700">Alterar Foto</label>
+                                <input type="file" id="edit-foto" name="edit-foto" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label for="edit-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                                <input type="text" id="edit-nome" name="edit-nome" value="${currentUser.nome}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <span id="edit-nome-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                             <div>
+                                <label for="edit-email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                                <input type="email" id="edit-email" name="edit-email" value="${currentUser.email}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <span id="edit-email-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    ${providerFields}
+                </form>
+            `;
+
+            if (isProvider) {
+                const reviewsContainer = document.getElementById('provider-reviews');
+                const providerAds = serviceProviders.filter(p => p.userId === currentUser.id);
+                const allReviews = providerAds.flatMap(ad => ad.avaliacoes_detalhadas);
+
+                if (allReviews.length > 0) {
+                    reviewsContainer.innerHTML = allReviews.map(aval => `
+                        <div class="bg-gray-100 p-4 rounded-lg border">
+                            <div class="flex items-center mb-2">
+                                ${generateStars(aval.nota)}
+                                <p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p>
+                            </div>
+                            <p class="text-gray-600">"${aval.comentario}"</p>
+                        </div>
+                    `).join('');
+                } else {
+                    reviewsContainer.innerHTML = '<p class="text-gray-500">Você ainda não recebeu nenhuma avaliação.</p>';
+                }
             }
+            
+            document.getElementById('form-editar-perfil').addEventListener('submit', handleUpdateProfile);
+            document.getElementById('edit-foto').addEventListener('change', (e) => {
+                const preview = document.getElementById('edit-foto-preview');
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        preview.src = event.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
             openModal(modal);
+        }
+
+        function handleUpdateProfile(event) {
+            event.preventDefault();
+            const form = event.target;
+            clearFormErrors(form);
+            let errors = {};
+
+            const nome = form.elements['edit-nome'].value.trim();
+            if (!nome) {
+                errors['edit-nome'] = 'O campo Nome Completo é obrigatório.';
+            } else if (nome.split(' ').length < 2) {
+                errors['edit-nome'] = 'Por favor, insira seu nome e sobrenome.';
+            }
+            // Add other validations as needed...
+
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([fieldName, message]) => {
+                    setFieldError(form, fieldName, message);
+                });
+                showNotification('Por favor, corrija os campos indicados.', 'error');
+                return;
+            }
+
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if(userIndex !== -1) {
+                const fotoInput = form.elements['edit-foto'];
+                const processUpdate = (newPhotoData) => {
+                    users[userIndex].nome = nome;
+                    users[userIndex].email = form.elements['edit-email'].value;
+                    if(newPhotoData) users[userIndex].foto = newPhotoData;
+
+                    if(currentUser.tipo === 'prestador') {
+                        users[userIndex].telefone = form.elements['edit-telefone'].value;
+                        users[userIndex].servicoPrincipal = form.elements['edit-servico'].value;
+                    }
+                    currentUser = { ...users[userIndex] };
+                    saveUsers();
+
+                    // Also update the name and photo in the serviceProviders array if it's a provider
+                    if (currentUser.tipo === 'prestador') {
+                        serviceProviders.forEach(provider => {
+                            if (provider.userId === currentUser.id) {
+                                provider.nome = nome;
+                                if(newPhotoData) provider.foto = newPhotoData;
+                            }
+                        });
+                        saveProviders();
+                    }
+                    
+                    showNotification('Perfil atualizado com sucesso!', 'success');
+                    closeModal(document.getElementById('modal-editar-perfil'));
+                    updateHeaderUI();
+                    displayServiceCards(serviceProviders); // Refresh cards to show new name if changed
+                };
+
+                if (fotoInput.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => processUpdate(e.target.result);
+                    reader.readAsDataURL(fotoInput.files[0]);
+                } else {
+                    processUpdate(null); // No new photo
+                }
+            }
+        }
+
+        function updateClock() {
+            const clockElement = document.getElementById('real-time-clock');
+            if (clockElement) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
         }
 
         // --- EVENT LISTENERS ---
@@ -1237,9 +1397,9 @@
         
         document.querySelectorAll('.modal-backdrop').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                // Prevent closing on backdrop click for registration modals
-                const isCadastroModal = modal.id === 'modal-cadastro-cliente' || modal.id === 'modal-cadastro-prestador';
-                if (e.target === modal && !isCadastroModal) {
+                // Prevent closing on backdrop click for registration and edit modals
+                const isProtectedModal = modal.id === 'modal-cadastro-cliente' || modal.id === 'modal-cadastro-prestador' || modal.id === 'modal-editar-perfil' || modal.id === 'modal-criar-anuncio';
+                if (e.target === modal && !isProtectedModal) {
                     closeModal(modal);
                 }
             });
@@ -1348,6 +1508,8 @@
         initializeData();
         checkSession();
         displayServiceCards(serviceProviders);
+        updateClock();
+        setInterval(updateClock, 1000);
     });
     </script>
 </body>
