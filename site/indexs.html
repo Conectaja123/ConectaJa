@@ -82,6 +82,13 @@
         .error-message {
             height: 1rem; /* Reserve space to prevent layout shift */
         }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -211,7 +218,7 @@
             <div class="p-6 border-b flex justify-between items-center">
                 <h3 class="text-xl font-bold text-gray-900">Acessar sua Conta</h3>
                  <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
                 </button>
             </div>
             <form id="form-login" class="p-8 space-y-6">
@@ -252,8 +259,9 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label for="anuncio-descricao" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
-                        <button type="button" id="btn-gerar-descricao" class="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded-full px-3 py-1 flex items-center gap-1">
-                            ✨ Gerar com IA
+                        <button type="button" id="btn-gerar-descricao" class="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded-full px-3 py-1 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="ai-button-icon">✨</span>
+                            <span id="ai-button-text">Gerar com IA</span>
                         </button>
                     </div>
                     <textarea id="anuncio-descricao" rows="4" placeholder="Descreva o que está incluso, materiais, tempo estimado, etc." required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
@@ -603,8 +611,8 @@
              { id: 2, userId: 2, nome: "Fernanda Lima", servico: "Encanadora", localidade: "Rio de Janeiro, RJ", latitude: -22.906847, longitude: -43.172896, raio: 10, avaliacao: 4.9, avaliacoesTotal: 98, telefone: "5521912345678", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", logo: "https://placehold.co/100x100/e0e7ff/4f46e5?text=FL", descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas.", galeria_fotos: ["https://images.unsplash.com/photo-1582881348395-ead5503b2a59?q=80&w=2070&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Beatriz C.", nota: 5, comentario: "A Fernanda é fantástica! Encontrou um vazamento que ninguém mais achava."}]},
         ];
         const initialUsers = [
-             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista', cep: '01311-000', telefone: '11987654321', raio: 25 },
-             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora', cep: '20040-004', telefone: '21912345678', raio: 10 },
+             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista', cep: '01311-000', telefone: '11987654321', raio: 25, descricao_longa: "Com mais de 15 anos de experiência, ofereço soluções completas em elétrica residencial e comercial. Segurança e qualidade são minhas prioridades." },
+             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora', cep: '20040-004', telefone: '21912345678', raio: 10, descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas." },
              { id: 3, nome: "Cliente Teste", email: "cliente@email.com", senha: "123", tipo: "cliente", foto: "https://i.pravatar.cc/150?u=cliente@email.com", cep: "01001-000", rua: "Praça da Sé", bairro: "Sé", cidade: "São Paulo", estado: "SP" }
         ];
 
@@ -928,6 +936,7 @@
                     servicoPrincipal: form.elements['prestador-servico'].value,
                     raio: form.elements['prestador-raio'].value,
                     foto: e.target.result,
+                    descricao_longa: '' // Add empty description on registration
                 };
                 
                 users.push(newUser);
@@ -1076,6 +1085,15 @@
                 if (!response.ok) throw new Error('Erro na busca.');
                 const data = await response.json();
                 if (data.erro) return { error: 'CEP não encontrado.' };
+                // Mocking lat/lon for ViaCEP as it doesn't provide them
+                // A real application would use another API to geocode the address
+                if (data.localidade === "São Paulo") {
+                    data.lat = -23.550520;
+                    data.lon = -46.633308;
+                } else if (data.localidade === "Rio de Janeiro") {
+                    data.lat = -22.906847;
+                    data.lon = -43.172896;
+                }
                 return { data };
             } catch (error) {
                 return { error: 'Erro ao buscar CEP.' };
@@ -1106,12 +1124,10 @@
 
             if (cepInput) {
                 const cepResult = await fetchCEPData(cepInput);
-                if (cepResult.data) {
-                    // Mocking lat/lon for ViaCEP as it doesn't provide them
-                    // A real application would use another API to geocode the address
-                    userLocation = { lat: -23.5505, lon: -46.6333 }; 
+                if (cepResult.data && cepResult.data.lat && cepResult.data.lon) {
+                    userLocation = { lat: cepResult.data.lat, lon: cepResult.data.lon }; 
                 } else {
-                    showNotification('CEP de busca inválido.', 'error');
+                    showNotification('CEP de busca inválido ou sem coordenadas.', 'error');
                     return;
                 }
             }
@@ -1178,24 +1194,27 @@
                 grid.innerHTML = `<p class="text-gray-500 col-span-full text-center">Nenhum resultado encontrado para os filtros aplicados.</p>`;
                 return;
             }
-            providers.forEach(provider => {
+            providers.forEach(providerAd => {
+                const providerUser = users.find(u => u.id === providerAd.userId);
+                const mainServiceDisplay = providerUser ? providerUser.servicoPrincipal : providerAd.servico;
+
                 const cardHTML = `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                    <div class="relative card-clicavel" data-provider-id="${provider.id}">
-                        <img class="h-40 w-full object-cover pointer-events-none" src="${provider.foto}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Sem+Foto';" alt="Foto de ${provider.nome}">
-                        ${provider.logo ? `<img class="w-16 h-16 rounded-full border-4 border-white absolute -bottom-8 right-4 pointer-events-none" src="${provider.logo}" alt="Logo de ${provider.nome}">` : ''}
+                    <div class="relative card-clicavel" data-provider-id="${providerAd.id}">
+                        <img class="h-40 w-full object-cover pointer-events-none" src="${providerAd.foto}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Sem+Foto';" alt="Foto de ${providerAd.nome}">
+                        ${providerAd.logo ? `<img class="w-16 h-16 rounded-full border-4 border-white absolute -bottom-8 right-4 pointer-events-none" src="${providerAd.logo}" alt="Logo de ${providerAd.nome}">` : ''}
                     </div>
-                    <div class="p-5 flex-grow card-clicavel" data-provider-id="${provider.id}">
-                        <div class="uppercase tracking-wide text-sm text-blue-600 font-semibold pointer-events-none">${provider.servico}</div>
-                        <p class="block mt-1 text-lg leading-tight font-bold text-black pointer-events-none">${provider.nome}</p>
+                    <div class="p-5 flex-grow card-clicavel" data-provider-id="${providerAd.id}">
+                        <div class="uppercase tracking-wide text-sm text-blue-600 font-semibold pointer-events-none">${mainServiceDisplay}</div>
+                        <p class="block mt-1 text-lg leading-tight font-bold text-black pointer-events-none">${providerAd.nome}</p>
                         <p class="mt-2 text-sm text-gray-500 flex items-center pointer-events-none">
                             <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            ${provider.localidade}
+                            ${providerAd.localidade}
                         </p>
                     </div>
                     <div class="p-4 bg-gray-50 border-t">
                         <div class="flex items-center justify-between">
-                            ${generateStars(provider.avaliacao)}
-                            <span class="text-gray-600 text-sm font-medium" id="rating-text-${provider.id}">${provider.avaliacao.toFixed(1)} (${provider.avaliacoesTotal})</span>
+                            ${generateStars(providerAd.avaliacao)}
+                            <span class="text-gray-600 text-sm font-medium" id="rating-text-${providerAd.id}">${providerAd.avaliacao.toFixed(1)} (${providerAd.avaliacoesTotal})</span>
                         </div>
                     </div>
                 </div>`;
@@ -1233,6 +1252,10 @@
                             <label for="edit-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
                             <input type="text" id="edit-servico" name="edit-servico" value="${currentUser.servicoPrincipal || ''}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                              <span id="edit-servico-error" class="text-xs text-red-600 error-message block"></span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="edit-descricao-longa" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
+                            <textarea id="edit-descricao-longa" name="edit-descricao-longa" rows="4" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">${currentUser.descricao_longa || ''}</textarea>
                         </div>
                     </div>
                 </div>
@@ -1342,27 +1365,29 @@
                     if(newPhotoData) users[userIndex].foto = newPhotoData;
 
                     if(currentUser.tipo === 'prestador') {
+                        const newDescription = form.elements['edit-descricao-longa'].value;
                         users[userIndex].telefone = form.elements['edit-telefone'].value;
                         users[userIndex].servicoPrincipal = form.elements['edit-servico'].value;
-                    }
-                    currentUser = { ...users[userIndex] };
-                    saveUsers();
+                        users[userIndex].descricao_longa = newDescription;
 
-                    // Also update the name and photo in the serviceProviders array if it's a provider
-                    if (currentUser.tipo === 'prestador') {
+                        // Also update the name, photo, and description in all serviceProviders ads
                         serviceProviders.forEach(provider => {
                             if (provider.userId === currentUser.id) {
                                 provider.nome = nome;
                                 if(newPhotoData) provider.foto = newPhotoData;
+                                provider.descricao_longa = newDescription;
                             }
                         });
                         saveProviders();
                     }
                     
+                    currentUser = { ...users[userIndex] };
+                    saveUsers();
+                    
                     showNotification('Perfil atualizado com sucesso!', 'success');
                     closeModal(document.getElementById('modal-editar-perfil'));
                     updateHeaderUI();
-                    displayServiceCards(serviceProviders); // Refresh cards to show new name if changed
+                    displayServiceCards(serviceProviders); // Refresh cards to show new data
                 };
 
                 if (fotoInput.files.length > 0) {
@@ -1385,6 +1410,64 @@
                 clockElement.textContent = `${hours}:${minutes}:${seconds}`;
             }
         }
+
+        async function generateDescriptionWithAI() {
+            const button = document.getElementById('btn-gerar-descricao');
+            const buttonText = document.getElementById('ai-button-text');
+            const buttonIcon = document.getElementById('ai-button-icon');
+            const titulo = document.getElementById('anuncio-titulo').value;
+            const tipoServico = document.getElementById('anuncio-tipo-servico').value;
+            const descricaoTextarea = document.getElementById('anuncio-descricao');
+
+            if (!titulo) {
+                showNotification('Por favor, preencha o Título do Anúncio primeiro.', 'error');
+                return;
+            }
+
+            // Set loading state
+            button.disabled = true;
+            buttonText.textContent = 'Gerando...';
+            buttonIcon.innerHTML = `<svg class="w-4 h-4 spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+            const prompt = `Crie uma descrição detalhada e atraente para um anúncio de serviço. O serviço principal é '${tipoServico}' e o título do anúncio é '${titulo}'. A descrição deve ser profissional, em português do Brasil, destacar os benefícios para o cliente e incentivar o contato. Não inclua informações de contato como telefone ou email. Fale em primeira pessoa (ex: 'Ofereço...', 'Meu serviço inclui...'). Mantenha a descrição concisa, com no máximo 3 parágrafos.`;
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = "" // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    descricaoTextarea.value = text;
+                    showNotification('Descrição gerada com sucesso!', 'success');
+                } else {
+                    throw new Error('Não foi possível gerar a descrição. A resposta da IA estava vazia.');
+                }
+            } catch (error) {
+                console.error("Erro ao gerar descrição com IA:", error);
+                showNotification('Ocorreu um erro ao gerar a descrição. Tente novamente.', 'error');
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                buttonText.textContent = 'Gerar com IA';
+                buttonIcon.innerHTML = '✨';
+            }
+        }
+
 
         // --- EVENT LISTENERS ---
         
@@ -1503,6 +1586,9 @@
             e.preventDefault();
             openModal(document.getElementById('modal-avaliacao-site'))
         });
+
+        // Gemini AI button
+        document.getElementById('btn-gerar-descricao').addEventListener('click', generateDescriptionWithAI);
         
         // --- CHAMADA INICIAL ---
         initializeData();
