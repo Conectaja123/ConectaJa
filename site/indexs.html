@@ -1,136 +1,142 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConectaServiços - Encontre Prestadores Perto de Você</title>
+    <title>ConectaServiços - A sua plataforma de serviços</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Icons: Heroicons (são inseridos diretamente no HTML para simplicidade) -->
+    <!-- Alpine.js para interatividade -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        /* Estilos personalizados */
+        /* Estilos personalizados e configuração do tema */
+        :root {
+            --background: 210 40% 98%; /* slate-50 */
+            --foreground: 222.2 84% 4.9%; /* slate-950 */
+            --card: 210 40% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 210 40% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%; /* Blue-600 */
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%; /* slate-100 */
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 142.1 76.2% 36.3%; /* Green-600 */
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+        }
+
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 217.2 91.2% 59.8%; /* Blue-500 */
+            --primary-foreground: 222.2 47.4% 11.2%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 142.1 70.6% 45.3%; /* Green-500 */
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 217.2 91.2% 59.8%;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* gray-50 */
+            font-family: 'Poppins', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        /* Outros estilos personalizados */
         .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-            transition: opacity 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
         }
-        .input-invalido {
-            border-color: #ef4444; /* red-500 */
-        }
-        .input-invalido:focus {
-            border-color: #ef4444;
-            --tw-ring-color: #ef4444;
-        }
-        .cpf-valido {
-            border-color: #22c55e; /* green-500 */
-        }
-        /* Animação para o modal */
         .modal-scale-enter {
             animation: scale-in 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
         }
-        .modal-scale-leave {
-            animation: scale-out 0.3s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
-        }
         @keyframes scale-in {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.95) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
-        @keyframes scale-out {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.9); opacity: 0; }
+        .modal-scrollable::-webkit-scrollbar { width: 6px; }
+        .modal-scrollable::-webkit-scrollbar-track { background: hsl(var(--secondary)); }
+        .modal-scrollable::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px; }
+        .modal-scrollable::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary)); }
+        
+        .tab-button[aria-selected="true"] {
+            border-color: hsl(var(--primary));
+            color: hsl(var(--primary));
         }
-        .dropdown-menu {
-            z-index: 20;
-        }
-        .card-clicavel {
-            cursor: pointer;
-        }
-        /* Scrollbar customizada para os modais */
-        .modal-scrollable::-webkit-scrollbar { width: 8px; }
-        .modal-scrollable::-webkit-scrollbar-track { background: #f1f1f1; }
-        .modal-scrollable::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-        .modal-scrollable::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-        .rating-stars {
-            display: inline-block;
-            direction: rtl;
-        }
-        .rating-stars input {
-            display: none;
-        }
-        .rating-stars label {
-            color: #d1d5db; /* gray-300 */
-            font-size: 2.5rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .rating-stars input:checked ~ label,
-        .rating-stars label:hover,
-        .rating-stars label:hover ~ label {
-            color: #f59e0b; /* amber-500 */
-        }
-        .error-message {
-            height: 1rem; /* Reserve space to prevent layout shift */
-        }
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+
+        .progress-bar-fill {
+            transition: width 0.4s ease-in-out;
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body>
 
     <!-- =========== Cabeçalho e Navegação =========== -->
-    <header class="bg-white shadow-md sticky top-0 z-40">
+    <header class="bg-[hsl(var(--card))]/80 dark:bg-[hsl(var(--background))]/80 backdrop-blur-sm shadow-sm sticky top-0 z-40 transition-colors">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="#" class="text-2xl font-bold text-blue-600">ConectaServiços</a>
+                    <a href="#" class="text-3xl font-bold text-[hsl(var(--primary))]">ConectaServiços</a>
                 </div>
                 
                 <!-- Menu Desktop -->
-                <div class="hidden md:flex md:items-center md:space-x-8">
-                    <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Início</a>
-                    <a href="#servicos" class="text-gray-600 hover:text-blue-600 font-medium">Serviços</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Sobre Nós</a>
+                <div class="hidden md:flex md:items-center md:space-x-10">
+                    <a href="#" class="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] font-medium transition-colors">Início</a>
+                    <a href="#servicos" class="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] font-medium transition-colors">Serviços</a>
+                    <a href="#" class="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] font-medium transition-colors">Sobre Nós</a>
                 </div>
 
-                <!-- Real-time Clock -->
-                <div class="hidden sm:block text-sm font-medium text-gray-600">
-                    <span id="real-time-clock"></span>
-                </div>
-
-                <!-- Botões de Ação (Estado Deslogado) -->
-                <div id="header-anonimo" class="flex items-center space-x-2">
-                    <button id="btn-abrir-login" class="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Login</button>
-                    <button id="btn-abrir-escolha" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">Cadastre-se</button>
-                </div>
-                
-                <!-- Perfil do Usuário (Estado Logado) -->
-                <div id="header-logado" class="hidden items-center space-x-4 relative">
-                    <span id="greeting-message" class="text-sm text-gray-600 hidden"></span>
-                    <button id="btn-abrir-anuncio" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
-                        Criar Anúncio
+                <div class="flex items-center gap-4">
+                     <!-- Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" class="p-2 rounded-full text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))] transition-colors">
+                        <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                        <svg x-show="darkMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
                     </button>
-                    <div id="perfil-dropdown-container" class="relative">
-                        <img id="header-foto-perfil" src="" alt="Foto do Perfil" class="w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-blue-500">
-                        <div id="perfil-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 dropdown-menu">
-                            <!-- Conteúdo do menu é dinâmico -->
+
+                    <!-- Botões de Ação (Estado Deslogado) -->
+                    <div id="header-anonimo" class="flex items-center space-x-2">
+                        <button id="btn-abrir-login" class="px-5 py-2.5 text-sm font-semibold text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 rounded-lg hover:bg-[hsl(var(--primary))]/20 transition-all transform hover:scale-105">Login</button>
+                        <button id="btn-abrir-cadastro" class="px-5 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/20">Cadastre-se</button>
+                    </div>
+                    
+                    <!-- Perfil do Usuário (Estado Logado) -->
+                    <div id="header-logado" class="hidden items-center space-x-4 relative">
+                        <button id="btn-header-anunciar" class="hidden px-5 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--accent))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--accent))]/20 flex items-center gap-2">
+                            Anunciar
+                        </button>
+                        <div id="perfil-dropdown-container" class="relative">
+                            <img id="header-foto-perfil" src="" alt="Foto do Perfil" class="w-12 h-12 rounded-full cursor-pointer border-2 border-transparent hover:border-[hsl(var(--primary))] object-cover transition-all">
+                            <div id="perfil-dropdown-menu" class="hidden absolute right-0 mt-3 w-56 bg-[hsl(var(--card))] rounded-lg shadow-2xl py-2 ring-1 ring-black/5 dark:ring-white/10 dropdown-menu">
+                                <!-- Conteúdo do menu é dinâmico -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -138,47 +144,35 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <section class="text-center mb-12">
-            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Encontre o profissional certo, na hora certa.</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Milhares de prestadores de serviço qualificados e avaliados, prontos para atender você.</p>
+    <main id="main-content-view" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <section class="text-center mb-20">
+            <h1 class="text-4xl md:text-6xl font-bold text-[hsl(var(--foreground))] mb-6 leading-tight">Encontre o profissional <span class="text-[hsl(var(--primary))]">certo</span>, na hora <span class="text-[hsl(var(--accent))]">certa</span>.</h1>
+            <p class="text-lg text-[hsl(var(--muted-foreground))] max-w-3xl mx-auto">Milhares de prestadores de serviço qualificados e avaliados, prontos para atender você com a máxima eficiência.</p>
         </section>
 
         <!-- Filtros de Busca -->
-        <div id="search-filters" class="bg-white p-6 rounded-xl shadow-lg mb-12">
+        <div id="search-filters" class="bg-[hsl(var(--card))] p-6 rounded-2xl shadow-2xl shadow-slate-500/10 dark:shadow-black/20 mb-16">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 <div class="lg:col-span-2">
-                    <label for="tipo-servico" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Serviço</label>
-                    <input type="text" id="tipo-servico" placeholder="Ex: Eletricista, Encanador" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <label for="tipo-servico" class="block text-sm font-medium text-[hsl(var(--card-foreground))] mb-1">Tipo de Serviço</label>
+                    <input type="text" id="tipo-servico" placeholder="Ex: Eletricista, Encanador" class="w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                 </div>
                 <div>
-                     <label for="search-cep" class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
-                     <input type="text" id="search-cep" placeholder="00000-000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                     <label for="search-cep" class="block text-sm font-medium text-[hsl(var(--card-foreground))] mb-1">CEP</label>
+                     <input type="text" id="search-cep" placeholder="00000-000" class="w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                 </div>
-                <div>
-                    <label for="search-cidade" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                    <input type="text" id="search-cidade" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
-                </div>
-                 <div>
-                    <label for="search-estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                    <input type="text" id="search-estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                <div class="lg:col-span-2">
+                    <label for="search-cidade" class="block text-sm font-medium text-[hsl(var(--card-foreground))] mb-1">Cidade</label>
+                    <input type="text" id="search-cidade" class="w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
                 </div>
                 
-                <div class="lg:col-span-2">
-                    <label for="search-rua" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
-                    <input type="text" id="search-rua" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
-                </div>
-                 <div>
-                    <label for="search-bairro" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-                    <input type="text" id="search-bairro" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                <div class="lg:col-span-3">
+                    <label for="search-rua" class="block text-sm font-medium text-[hsl(var(--card-foreground))] mb-1">Rua</label>
+                    <input type="text" id="search-rua" class="w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
                 </div>
                 <div>
-                    <label for="search-numero" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                    <input type="text" id="search-numero" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="raio-atendimento" class="block text-sm font-medium text-gray-700 mb-1">Raio (KM)</label>
-                    <select id="raio-atendimento" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <label for="raio-atendimento" class="block text-sm font-medium text-[hsl(var(--card-foreground))] mb-1">Raio (KM)</label>
+                    <select id="raio-atendimento" class="w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                         <option value="">Qualquer</option>
                         <option value="5">Até 5 km</option>
                         <option value="10">Até 10 km</option>
@@ -188,25 +182,72 @@
                     </select>
                 </div>
                 <div class="lg:col-start-5">
-                    <button id="btn-buscar" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center h-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                    <button id="btn-buscar" class="w-full bg-[hsl(var(--primary))] text-white px-4 py-3 rounded-lg font-semibold hover:opacity-90 transition flex items-center justify-center h-full shadow-lg shadow-[hsl(var(--primary))]/30 transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         Buscar
                     </button>
                 </div>
             </div>
+             <!-- Botão Solicitar Serviço -->
+            <div class="mt-8 text-center border-t border-[hsl(var(--border))] pt-6">
+                <p class="text-[hsl(var(--muted-foreground))] mb-3">Não encontrou o que precisava ou quer receber propostas?</p>
+                <button id="btn-abrir-solicitar-servico" class="bg-[hsl(var(--accent))] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-transform transform hover:scale-105 flex items-center justify-center gap-2 mx-auto shadow-lg shadow-[hsl(var(--accent))]/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    Publicar um Pedido de Serviço
+                </button>
+            </div>
         </div>
 
         <section id="servicos">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Prestadores em Destaque</h2>
-            <div id="service-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <h2 class="text-3xl font-bold mb-8 text-[hsl(var(--foreground))]">Prestadores em Destaque</h2>
+            <div id="service-cards-list" class="space-y-6">
+                <!-- Cards de serviço serão inseridos aqui -->
             </div>
         </section>
     </main>
     
-    <footer class="bg-gray-800 text-white mt-16">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-            <a href="#" id="btn-abrir-avaliacao-site" class="text-blue-400 hover:text-blue-300 hover:underline">Avalie nosso site</a>
-            <p class="text-sm text-gray-400 mt-2">© 2024 ConectaServiços. Todos os direitos reservados.</p>
+    <footer class="bg-slate-900 text-slate-300 mt-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-4">
+                    <h3 class="text-3xl font-bold text-[hsl(var(--primary))]">ConectaServiços</h3>
+                    <p class="text-slate-400 mt-2 text-sm">Conectando você aos melhores profissionais.</p>
+                     <div class="flex space-x-4 mt-6">
+                        <a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                        <a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
+                        <a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
+                    </div>
+                </div>
+                <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-white">Plataforma</h4>
+                        <ul class="space-y-2 mt-4">
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Encontrar Profissionais</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Como Funciona</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Preços</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white">Empresa</h4>
+                        <ul class="space-y-2 mt-4">
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Sobre Nós</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Carreiras</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Imprensa</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white">Legal</h4>
+                        <ul class="space-y-2 mt-4">
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Termos de Serviço</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-[hsl(var(--primary))] transition-colors text-sm">Política de Privacidade</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-500">
+                <p>© 2024 ConectaServiços. Todos os direitos reservados.</p>
+                 <a href="#" id="btn-abrir-avaliacao-site" class="text-[hsl(var(--primary))] hover:underline mt-2 inline-block">Avalie nosso site</a>
+            </div>
         </div>
     </footer>
 
@@ -214,25 +255,25 @@
     
     <!-- Modal de LOGIN -->
     <div id="modal-login" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-900">Acessar sua Conta</h3>
-                 <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-md modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center">
+                <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Acessar sua Conta</h3>
+                 <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                 </button>
             </div>
             <form id="form-login" class="p-8 space-y-6">
                  <div>
-                    <label for="login-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                    <input type="email" id="login-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <label for="login-email" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">E-mail</label>
+                    <input type="email" id="login-email" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                 </div>
                 <div>
-                    <label for="login-senha" class="block text-sm font-medium text-gray-700">Senha</label>
-                    <input type="password" id="login-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <label for="login-senha" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Senha</label>
+                    <input type="password" id="login-senha" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                 </div>
-                <div class="flex items-center justify-end gap-4">
-                    <button type="button" class="btn-fechar-modal px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Entrar</button>
+                <div class="flex items-center justify-end gap-4 pt-4">
+                    <button type="button" class="btn-fechar-modal px-6 py-2.5 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Entrar</button>
                 </div>
             </form>
         </div>
@@ -240,328 +281,204 @@
 
     <!-- Modal de CRIAR ANÚNCIO -->
     <div id="modal-criar-anuncio" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center flex-shrink-0">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-900">Criar Novo Anúncio</h3>
-                    <p class="text-sm text-gray-500">Detalhe o serviço que você quer oferecer.</p>
+                    <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Criar Novo Anúncio</h3>
+                    <p class="text-sm text-[hsl(var(--muted-foreground))]">Detalhe o serviço que você quer oferecer.</p>
                 </div>
+                 <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
             </div>
             <form id="form-criar-anuncio" class="p-8 space-y-6 overflow-y-auto modal-scrollable flex-grow">
                 <div>
-                    <label for="anuncio-titulo" class="block text-sm font-medium text-gray-700">Título do Anúncio</label>
-                    <input type="text" id="anuncio-titulo" placeholder="Ex: Promoção de Instalação de Ar Condicionado" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <label for="anuncio-titulo" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Título do Anúncio</label>
+                    <input type="text" id="anuncio-titulo" placeholder="Ex: Promoção de Instalação de Ar Condicionado" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
                 </div>
                 <div>
-                    <label for="anuncio-tipo-servico" class="block text-sm font-medium text-gray-700">Tipo de Serviço</label>
-                    <input type="text" id="anuncio-tipo-servico" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                    <label for="anuncio-tipo-servico" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Tipo de Serviço</label>
+                    <input type="text" id="anuncio-tipo-servico" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label for="anuncio-descricao" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
+                        <label for="anuncio-descricao" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Descrição Detalhada do Serviço</label>
                         <button type="button" id="btn-gerar-descricao" class="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded-full px-3 py-1 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
                             <span id="ai-button-icon">✨</span>
                             <span id="ai-button-text">Gerar com IA</span>
                         </button>
                     </div>
-                    <textarea id="anuncio-descricao" rows="4" placeholder="Descreva o que está incluso, materiais, tempo estimado, etc." required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <textarea id="anuncio-descricao" rows="4" placeholder="Descreva o que está incluso, materiais, tempo estimado, etc." required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Fotos do Serviço (Máx. 4)</label>
-                    <input type="file" id="anuncio-fotos" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <label class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Fotos do Serviço (Máx. 4)</label>
+                    <input type="file" id="anuncio-fotos" accept="image/*" multiple class="mt-1 block w-full text-sm text-[hsl(var(--muted-foreground))] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[hsl(var(--primary))]/10 file:text-[hsl(var(--primary))] hover:file:bg-[hsl(var(--primary))]/20"/>
                     <div id="fotos-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <!-- Previews das imagens aparecerão aqui -->
                     </div>
                 </div>
             </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
-                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                <button type="submit" form="form-criar-anuncio" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Publicar Anúncio</button>
+            <div class="p-6 border-t border-[hsl(var(--border))] bg-[hsl(var(--secondary))]/50 flex justify-end space-x-3 rounded-b-2xl flex-shrink-0">
+                <button type="button" class="btn-fechar-modal px-6 py-2.5 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Cancelar</button>
+                <button type="submit" form="form-criar-anuncio" class="px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Publicar Anúncio</button>
             </div>
         </div>
     </div>
 
-
-    <!-- Modal de ESCOLHA de Tipo de Cadastro -->
-    <div id="modal-escolha-cadastro" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md modal-scale-enter text-center">
-             <div class="p-6 border-b">
-                <h3 class="text-xl font-bold text-gray-900">Como você quer se juntar a nós?</h3>
-                <p class="text-sm text-gray-500 mt-1">Escolha o tipo de perfil que deseja criar.</p>
-            </div>
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <button id="btn-escolha-cliente" class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-blue-500 mb-3"><path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 5.69 3.117A1 1 0 0 1 16.999 16.5h-10a1 1 0 0 1-.69-.383Z" clip-rule="evenodd" /></svg>
-                    <span class="font-semibold text-lg">Sou Cliente</span>
-                    <span class="text-sm text-gray-500">Quero contratar serviços</span>
-                </button>
-                <button id="btn-escolha-prestador" class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-green-500 mb-3"><path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM2.25 7.93v6.54l8.628 5.032a.75.75 0 0 0 .744 0l-9-5.25v-9l9 5.25-9-5.25Z" /></svg>
-                    <span class="font-semibold text-lg">Sou Prestador</span>
-                    <span class="text-sm text-gray-500">Quero oferecer serviços</span>
+    <!-- Modal de Cadastro Unificado -->
+    <div id="modal-cadastro" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center sticky top-0 bg-[hsl(var(--card))]/80 backdrop-blur-sm z-10 flex-shrink-0">
+                <div>
+                    <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Crie sua Conta</h3>
+                    <p class="text-sm text-[hsl(var(--muted-foreground))]">Siga os passos para começar.</p>
+                </div>
+                 <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                 </button>
             </div>
-             <div class="p-4 bg-gray-50 border-t text-right">
-                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
+            
+            <!-- Barra de Progresso -->
+            <div class="w-full bg-[hsl(var(--secondary))] h-2 rounded-t-none">
+                <div id="progress-bar" class="bg-[hsl(var(--primary))] h-2 rounded-r-full progress-bar-fill" style="width: 25%;"></div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal de Cadastro do CLIENTE -->
-    <div id="modal-cadastro-cliente" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 flex-shrink-0">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900">Cadastro de Cliente</h3>
-                    <p class="text-sm text-gray-500">Crie sua conta para contratar e avaliar serviços.</p>
-                </div>
-            </div>
-            <form id="form-cadastro-cliente" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow" novalidate>
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                         <div>
-                            <label for="cliente-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                            <input type="email" id="cliente-email" name="cliente-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cliente-email-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="cliente-email-confirm" class="block text-sm font-medium text-gray-700">Confirmar E-mail</label>
-                            <input type="email" id="cliente-email-confirm" name="cliente-email-confirm" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cliente-email-confirm-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="cliente-senha" class="block text-sm font-medium text-gray-700">Senha</label>
-                            <input type="password" id="cliente-senha" name="cliente-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cliente-senha-error" class="text-xs text-red-600 error-message block"></span>
+            <form id="form-cadastro" class="p-8 overflow-y-auto modal-scrollable flex-grow" novalidate>
+                <div id="registration-steps">
+                    <!-- Etapa 1: Acesso -->
+                    <div data-step="1">
+                        <h4 class="font-semibold text-lg text-[hsl(var(--foreground))] mb-4">Etapa 1: Dados de Acesso</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="cadastro-email" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">E-mail</label>
+                                <input type="email" id="cadastro-email" name="cadastro-email" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                <span id="cadastro-email-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                            <div>
+                                <label for="cadastro-senha" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Senha (mínimo 8 caracteres)</label>
+                                <input type="password" id="cadastro-senha" name="cadastro-senha" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                <span id="cadastro-senha-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                        <div class="md:col-span-2">
-                            <label for="cliente-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                            <input type="text" id="cliente-nome" name="cliente-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cliente-nome-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="cliente-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-                            <input type="text" id="cliente-cpf" name="cliente-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <span id="cliente-cpf-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                             <label for="cliente-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
-                             <input type="date" id="cliente-nascimento" name="cliente-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="cliente-nascimento-error" class="text-xs text-red-600 error-message block"></span>
+                    <!-- Etapa 2: Pessoal -->
+                    <div data-step="2" class="hidden">
+                        <h4 class="font-semibold text-lg text-[hsl(var(--foreground))] mb-4">Etapa 2: Dados Pessoais</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="cadastro-nome" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Nome Completo</label>
+                                <input type="text" id="cadastro-nome" name="cadastro-nome" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                <span id="cadastro-nome-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="cadastro-cpf" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">CPF</label>
+                                    <input type="text" id="cadastro-cpf" name="cadastro-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                    <span id="cadastro-cpf-error" class="text-xs text-red-600 error-message block"></span>
+                                </div>
+                                <div>
+                                     <label for="cadastro-nascimento" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Data de Nascimento</label>
+                                     <input type="date" id="cadastro-nascimento" name="cadastro-nascimento" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                     <span id="cadastro-nascimento-error" class="text-xs text-red-600 error-message block"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Seu Endereço</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
-                        <div>
-                            <label for="cliente-cep" class="block text-sm font-medium text-gray-700">CEP</label>
-                            <input type="text" id="cliente-cep" name="cliente-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="cliente-cep-error" class="text-xs text-red-600 error-message block"></span>
+                    <!-- Etapa 3: Endereço -->
+                    <div data-step="3" class="hidden">
+                         <h4 class="font-semibold text-lg text-[hsl(var(--foreground))] mb-4">Etapa 3: Endereço</h4>
+                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="cadastro-cep" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">CEP</label>
+                                <input type="text" id="cadastro-cep" name="cadastro-cep" placeholder="00000-000" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                <span id="cadastro-cep-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                             <div class="md:col-span-2">
+                                <label for="cadastro-rua" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Rua</label>
+                                <input type="text" id="cadastro-rua" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
+                            </div>
+                            <div>
+                                <label for="cadastro-numero" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Número</label>
+                                <input type="text" id="cadastro-numero" name="cadastro-numero" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                 <span id="cadastro-numero-error" class="text-xs text-red-600 error-message block"></span>
+                            </div>
+                            <div>
+                                <label for="cadastro-bairro" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Bairro</label>
+                                <input type="text" id="cadastro-bairro" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
+                            </div>
+                            <div>
+                                <label for="cadastro-cidade" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Cidade</label>
+                                <input type="text" id="cadastro-cidade" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
+                            </div>
                         </div>
-                         <div class="md:col-span-2">
-                            <label for="cliente-rua" class="block text-sm font-medium text-gray-700">Rua</label>
-                            <input type="text" id="cliente-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                    </div>
+                    <!-- Etapa 4: Perfil -->
+                    <div data-step="4" class="hidden">
+                        <h4 class="font-semibold text-lg text-[hsl(var(--foreground))] mb-4">Etapa 4: Tipo de Perfil</h4>
+                        <div class="pt-4">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="quer-ser-prestador" class="h-5 w-5 rounded border-gray-300 text-[hsl(var(--primary))] focus:ring-[hsl(var(--primary))]">
+                                <span class="text-[hsl(var(--card-foreground))] font-medium">Quero também oferecer serviços</span>
+                            </label>
                         </div>
-                        <div>
-                            <label for="cliente-numero" class="block text-sm font-medium text-gray-700">Número</label>
-                            <input type="text" id="cliente-numero" name="cliente-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="cliente-numero-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="cliente-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
-                            <input type="text" id="cliente-bairro" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                        <div>
-                            <label for="cliente-cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
-                            <input type="text" id="cliente-cidade" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                        <div>
-                            <label for="cliente-estado" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" id="cliente-estado" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
+                        <div id="provider-fields" class="hidden pt-4 space-y-4 border-t border-[hsl(var(--border))] mt-4">
+                             <h4 class="font-semibold text-lg text-[hsl(var(--foreground))]">Perfil de Prestador</h4>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 <div class="md:col-span-2">
+                                     <label for="cadastro-servico" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Principal Serviço Prestado</label>
+                                     <input type="text" id="cadastro-servico" name="cadastro-servico" placeholder="Ex: Eletricista Residencial" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                     <span id="cadastro-servico-error" class="text-xs text-red-600 error-message block"></span>
+                                 </div>
+                                 <div>
+                                    <label for="cadastro-telefone" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Telefone / WhatsApp</label>
+                                    <input type="tel" id="cadastro-telefone" name="cadastro-telefone" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                                    <span id="cadastro-telefone-error" class="text-xs text-red-600 error-message block"></span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Foto de Perfil</label>
+                                    <input type="file" id="cadastro-foto" name="cadastro-foto" accept="image/*" class="mt-1 block w-full text-sm text-[hsl(var(--muted-foreground))] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[hsl(var(--primary))]/10 file:text-[hsl(var(--primary))] hover:file:bg-[hsl(var(--primary))]/20"/>
+                                     <span id="cadastro-foto-error" class="text-xs text-red-600 error-message block"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
-                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                <button type="submit" form="form-cadastro-cliente" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
+            <div class="p-6 border-t border-[hsl(var(--border))] bg-[hsl(var(--secondary))]/50 flex justify-between items-center rounded-b-2xl flex-shrink-0">
+                <button type="button" id="btn-cadastro-voltar" class="px-6 py-2.5 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Voltar</button>
+                <button type="button" id="btn-cadastro-proximo" class="px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Próximo</button>
+                <button type="submit" form="form-cadastro" id="btn-cadastro-finalizar" class="hidden px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--accent))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--accent))]/30">Finalizar Cadastro</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de LOGIN NECESSÁRIO -->
     <div id="modal-login-necessario" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm modal-scale-enter text-center p-8">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-sm modal-scale-enter text-center p-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-[hsl(var(--primary))]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            <h3 class="text-xl font-bold text-gray-900 mt-4">Login Necessário</h3>
-            <p class="text-gray-600 mt-2">Para utilizar a busca por endereço e raio, você precisa estar logado.</p>
+            <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))] mt-4">Login Necessário</h3>
+            <p id="login-necessario-texto" class="text-[hsl(var(--muted-foreground))] mt-2">Para realizar esta ação, você precisa estar logado.</p>
             <div class="mt-6 flex justify-center gap-4">
-                <button class="btn-fechar-modal px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Fechar</button>
-                <button id="btn-ir-login" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Fazer Login</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal de Cadastro do PRESTADOR -->
-    <div id="modal-cadastro-prestador" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div id="modal-content-prestador" class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 flex-shrink-0">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900">Cadastro de Prestador de Serviço</h3>
-                    <p class="text-sm text-gray-500">Preencha seus dados para começar a oferecer seus services.</p>
-                </div>
-            </div>
-            <form id="form-cadastro-prestador" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow" novalidate>
-                <!-- Seção Dados de Acesso -->
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados de Acesso</h4>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                         <div>
-                            <label for="prestador-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                            <input type="email" id="prestador-email" name="prestador-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-email-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="prestador-email-confirm" class="block text-sm font-medium text-gray-700">Confirmar E-mail</label>
-                            <input type="email" id="prestador-email-confirm" name="prestador-email-confirm" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-email-confirm-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="prestador-senha" class="block text-sm font-medium text-gray-700">Senha</label>
-                            <input type="password" id="prestador-senha" name="prestador-senha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-senha-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Seção Dados Pessoais -->
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                        <div class="md:col-span-2">
-                            <label for="prestador-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                            <input type="text" id="prestador-nome" name="prestador-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-nome-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="prestador-cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-                            <input type="text" id="prestador-cpf" name="prestador-cpf" placeholder="000.000.000-00" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <span id="prestador-cpf-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                             <label for="prestador-nascimento" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
-                             <input type="date" id="prestador-nascimento" name="prestador-nascimento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="prestador-nascimento-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="prestador-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
-                            <input type="tel" id="prestador-telefone" name="prestador-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-telefone-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Seção Endereço -->
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Endereço de Atendimento</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
-                        <div>
-                            <label for="prestador-cep" class="block text-sm font-medium text-gray-700">CEP</label>
-                            <input type="text" id="prestador-cep" name="prestador-cep" placeholder="00000-000" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-cep-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                         <div class="md:col-span-2">
-                            <label for="prestador-rua" class="block text-sm font-medium text-gray-700">Rua</label>
-                            <input type="text" id="prestador-rua" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                        <div>
-                            <label for="prestador-numero" class="block text-sm font-medium text-gray-700">Número</label>
-                            <input type="text" id="prestador-numero" name="prestador-numero" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="prestador-numero-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="prestador-bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
-                            <input type="text" id="prestador-bairro" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                        <div>
-                            <label for="prestador-cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
-                            <input type="text" id="prestador-cidade" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                        <div>
-                            <label for="prestador-estado" class="block text-sm font-medium text-gray-700">Estado</label>
-                            <input type="text" id="prestador-estado" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
-                        </div>
-                    </div>
-                </div>
-                <!-- Seção Perfil e Serviço -->
-                 <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Perfil e Serviço</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                         <div class="md:col-span-2">
-                             <label for="prestador-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
-                             <input type="text" id="prestador-servico" name="prestador-servico" placeholder="Ex: Eletricista Residencial" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="prestador-servico-error" class="text-xs text-red-600 error-message block"></span>
-                         </div>
-                         <div>
-                            <label for="prestador-raio" class="block text-sm font-medium text-gray-700">Raio de Atendimento</label>
-                             <select id="prestador-raio" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                 <option value="5">Até 5 km</option>
-                                 <option value="10">Até 10 km</option>
-                                 <option value="25">Até 25 km</option>
-                                 <option value="50">Até 50 km</option>
-                                 <option value="100">Até 100 km</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Foto de Perfil (Obrigatório)</label>
-                            <input type="file" id="prestador-foto" name="prestador-foto" required accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                             <span id="prestador-foto-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
-                <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                <button type="submit" form="form-cadastro-prestador" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Finalizar Cadastro</button>
+                <button class="btn-fechar-modal px-6 py-2.5 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Fechar</button>
+                <button id="btn-ir-login" class="px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Fazer Login</button>
             </div>
         </div>
     </div>
     
     <!-- Modal PERFIL -->
     <div id="modal-perfil-prestador" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div id="modal-perfil-content" class="bg-gray-50 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
-            <div class="sticky top-0 bg-white/80 backdrop-blur-sm z-10">
-                <div class="p-4 border-b flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-900">Perfil do Prestador</h3>
-                    <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        <div id="modal-perfil-content" class="bg-[hsl(var(--secondary))] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto modal-scale-enter modal-scrollable">
+            <div class="sticky top-0 bg-[hsl(var(--card))]/80 backdrop-blur-sm z-10">
+                <div class="p-4 border-b border-[hsl(var(--border))] flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Perfil do Prestador</h3>
+                    <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                 </div>
             </div>
             <div class="p-6 md:p-8" id="perfil-dinamico-conteudo">
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal EDITAR PERFIL -->
-    <div id="modal-editar-perfil" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
-                <h3 class="text-xl font-bold text-gray-900">Editar Perfil</h3>
-            </div>
-            <div id="editar-perfil-conteudo" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow">
-                <!-- Conteúdo do formulário de edição será inserido aqui pelo JS -->
-            </div>
-            <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3 rounded-b-xl flex-shrink-0">
-                 <button type="button" class="btn-fechar-modal px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                 <button type="submit" id="btn-salvar-perfil" form="form-editar-perfil" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -576,16 +493,16 @@
 
     <!-- Modal de AVALIAÇÃO DO SITE -->
     <div id="modal-avaliacao-site" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg modal-scale-enter">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-900">Avalie o ConectaServiços</h3>
-                <button type="button" class="btn-fechar-modal text-gray-400 hover:text-gray-600">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-lg modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center">
+                <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Avalie o ConectaServiços</h3>
+                <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                 </button>
             </div>
             <form id="form-avaliacao-site" class="p-8 space-y-6">
                  <div class="text-center">
-                    <p class="font-medium">O que você achou da sua experiência no site?</p>
+                    <p class="font-medium text-[hsl(var(--card-foreground))]">O que você achou da sua experiência no site?</p>
                     <div class="rating-stars mt-2">
                         <input type="radio" id="site-star5" name="site-rating" value="5" required><label for="site-star5">★</label>
                         <input type="radio" id="site-star4" name="site-rating" value="4"><label for="site-star4">★</label>
@@ -595,11 +512,116 @@
                     </div>
                 </div>
                 <div>
-                    <label for="site-avaliacao-comentario" class="block text-sm font-medium text-gray-700">Deixe um comentário (opcional):</label>
-                    <textarea id="site-avaliacao-comentario" rows="4" placeholder="Suas sugestões são bem-vindas!" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <label for="site-avaliacao-comentario" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Deixe um comentário (opcional):</label>
+                    <textarea id="site-avaliacao-comentario" rows="4" placeholder="Suas sugestões são bem-vindas!" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all"></textarea>
                 </div>
-                <button type="submit" class="w-full px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Enviar Avaliação</button>
+                <button type="submit" class="w-full px-6 py-3 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Enviar Avaliação</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal de SOLICITAR SERVIÇO -->
+    <div id="modal-solicitar-servico" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center flex-shrink-0">
+                <div>
+                    <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Publicar um Pedido de Serviço</h3>
+                    <p class="text-sm text-[hsl(var(--muted-foreground))]">Descreva o que você precisa e receba propostas.</p>
+                </div>
+                <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="form-solicitar-servico" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow" novalidate>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="solicitar-servico-titulo" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Título do Pedido</label>
+                        <input type="text" id="solicitar-servico-titulo" name="solicitar-servico-titulo" placeholder="Ex: Preciso de pintor para apartamento de 2 quartos" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                        <span id="solicitar-servico-titulo-error" class="text-xs text-red-600 error-message block"></span>
+                    </div>
+                    <div>
+                        <label for="solicitar-servico-categoria" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Categoria do Serviço</label>
+                        <select id="solicitar-servico-categoria" name="solicitar-servico-categoria" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                            <option value="">Selecione uma categoria</option>
+                            <option>Reformas e Reparos</option>
+                            <option>Serviços Domésticos</option>
+                            <option>Assistência Técnica</option>
+                            <option>Eventos</option>
+                            <option>Aulas</option>
+                            <option>Outros</option>
+                        </select>
+                        <span id="solicitar-servico-categoria-error" class="text-xs text-red-600 error-message block"></span>
+                    </div>
+                    <div>
+                        <label for="solicitar-servico-urgencia" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Urgência</label>
+                        <select id="solicitar-servico-urgencia" name="solicitar-servico-urgencia" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                             <option value="">Selecione a urgência</option>
+                             <option>Urgente (hoje ou amanhã)</option>
+                             <option>Nos próximos dias</option>
+                             <option>Nas próximas semanas</option>
+                             <option>Flexível</option>
+                        </select>
+                         <span id="solicitar-servico-urgencia-error" class="text-xs text-red-600 error-message block"></span>
+                    </div>
+                </div>
+                <div>
+                    <label for="solicitar-servico-descricao" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Descrição Detalhada</label>
+                    <textarea id="solicitar-servico-descricao" name="solicitar-servico-descricao" rows="5" placeholder="Forneça o máximo de detalhes possível sobre o serviço que você precisa." required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all"></textarea>
+                    <span id="solicitar-servico-descricao-error" class="text-xs text-red-600 error-message block"></span>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[hsl(var(--foreground))] border-b border-[hsl(var(--border))] pb-2 mb-4">Localização do Serviço</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="solicitar-servico-cep" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">CEP</label>
+                            <input type="text" id="solicitar-servico-cep" name="solicitar-servico-cep" placeholder="00000-000" required class="mt-1 w-full px-4 py-3 border border-[hsl(var(--input))] bg-[hsl(var(--background))] rounded-lg focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition-all">
+                            <span id="solicitar-servico-cep-error" class="text-xs text-red-600 error-message block"></span>
+                        </div>
+                        <div>
+                            <label for="solicitar-servico-cidade" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Cidade</label>
+                            <input type="text" id="solicitar-servico-cidade" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
+                        </div>
+                        <div>
+                            <label for="solicitar-servico-estado" class="block text-sm font-medium text-[hsl(var(--card-foreground))]">Estado</label>
+                            <input type="text" id="solicitar-servico-estado" class="mt-1 w-full px-4 py-3 border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))] rounded-lg" readonly>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="p-6 border-t border-[hsl(var(--border))] bg-[hsl(var(--secondary))]/50 flex justify-end space-x-3 rounded-b-2xl flex-shrink-0">
+                <button type="button" class="btn-fechar-modal px-6 py-2.5 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Cancelar</button>
+                <button type="submit" form="form-solicitar-servico" class="px-6 py-2.5 text-sm font-semibold text-white bg-[hsl(var(--accent))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--accent))]/30">Publicar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de VER PEDIDOS DE SERVIÇO -->
+    <div id="modal-ver-pedidos" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-[hsl(var(--card))] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-6 border-b border-[hsl(var(--border))] flex justify-between items-center flex-shrink-0">
+                <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))]">Pedidos de Serviço Abertos</h3>
+                <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="lista-pedidos-servico" class="p-8 space-y-4 overflow-y-auto modal-scrollable flex-grow">
+                <!-- Lista de pedidos será inserida aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal DASHBOARD -->
+    <div id="modal-dashboard" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="bg-[hsl(var(--secondary))] rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col modal-scale-enter">
+            <div class="p-4 border-b border-[hsl(var(--border))] flex justify-between items-center flex-shrink-0 bg-[hsl(var(--card))] rounded-t-2xl">
+                <h3 class="text-2xl font-bold text-[hsl(var(--card-foreground))]">Meu Painel</h3>
+                <button type="button" class="btn-fechar-modal text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="dashboard-content" class="flex-grow overflow-y-auto modal-scrollable">
+                <!-- Conteúdo do Dashboard será inserido aqui -->
+            </div>
         </div>
     </div>
     
@@ -608,18 +630,25 @@
         // --- DADOS MOCK INICIAIS ---
         const initialServiceProviders = [
              { id: 1, userId: 1, nome: "Carlos Silva", servico: "Eletricista", localidade: "São Paulo, SP", latitude: -23.550520, longitude: -46.633308, raio: 25, avaliacao: 4.8, avaliacoesTotal: 125, telefone: "5511987654321", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", logo: null, descricao_longa: "Com mais de 15 anos de experiência, ofereço soluções completas em elétrica residencial e comercial. Segurança e qualidade são minhas prioridades.", galeria_fotos: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop", "https://images.unsplash.com/photo-1487401217342-829f10a1334c?q=80&w=1962&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Mariana P.", nota: 5, comentario: "Excelente profissional! Pontual, organizado e resolveu meu problema rapidamente."}]},
-             { id: 2, userId: 2, nome: "Fernanda Lima", servico: "Encanadora", localidade: "Rio de Janeiro, RJ", latitude: -22.906847, longitude: -43.172896, raio: 10, avaliacao: 4.9, avaliacoesTotal: 98, telefone: "5521912345678", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", logo: "https://placehold.co/100x100/e0e7ff/4f46e5?text=FL", descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas.", galeria_fotos: ["https://images.unsplash.com/photo-1582881348395-ead5503b2a59?q=80&w=2070&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Beatriz C.", nota: 5, comentario: "A Fernanda é fantástica! Encontrou um vazamento que ninguém mais achava."}]},
+             { id: 2, userId: 2, nome: "Fernanda Lima", servico: "Encanadora", localidade: "Rio de Janeiro, RJ", latitude: -22.906847, longitude: -43.172896, raio: 10, avaliacao: 4.9, avaliacoesTotal: 98, telefone: "5521912345678", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", logo: "https://placehold.co/100x100/e0e7ff/4f46e5?text=FL", descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas.", galeria_fotos: ["https://images.unsplash.com/photo-1582881348395-ead5503b2a_59?q=80&w=2070&auto=format&fit=crop"], avaliacoes_detalhadas: [{cliente: "Beatriz C.", nota: 5, comentario: "A Fernanda é fantástica! Encontrou um vazamento que ninguém mais achava."}]},
         ];
         const initialUsers = [
-             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista', cep: '01311-000', telefone: '11987654321', raio: 25, descricao_longa: "Com mais de 15 anos de experiência, ofereço soluções completas em elétrica residencial e comercial. Segurança e qualidade são minhas prioridades." },
-             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", tipo: "prestador", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora', cep: '20040-004', telefone: '21912345678', raio: 10, descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas." },
-             { id: 3, nome: "Cliente Teste", email: "cliente@email.com", senha: "123", tipo: "cliente", foto: "https://i.pravatar.cc/150?u=cliente@email.com", cep: "01001-000", rua: "Praça da Sé", bairro: "Sé", cidade: "São Paulo", estado: "SP" }
+             { id: 1, nome: "Carlos Silva", email: "carlos.silva@email.com", senha: "123", papeis: ['cliente', 'prestador'], foto: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80", servicoPrincipal: 'Eletricista', cep: '01311-000', telefone: '11987654321', raio: 25, descricao_longa: "Com mais de 15 anos de experiência, ofereço soluções completas em elétrica residencial e comercial. Segurança e qualidade são minhas prioridades." },
+             { id: 2, nome: "Fernanda Lima", email: "fernanda.lima@email.com", senha: "123", papeis: ['cliente', 'prestador'], foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", servicoPrincipal: 'Encanadora', cep: '20040-004', telefone: '21912345678', raio: 10, descricao_longa: "Especialista em reparos de vazamentos, desentupimentos e instalações hidráulicas." },
+             { id: 3, nome: "Cliente Teste", email: "cliente@email.com", senha: "123", papeis: ['cliente'], foto: "https://i.pravatar.cc/150?u=cliente@email.com", cep: "01001-000", rua: "Praça da Sé", bairro: "Sé", cidade: "São Paulo", estado: "SP" }
+        ];
+        const initialServiceRequests = [
+            { id: 1, userId: 3, titulo: "Pintura de sala de estar", categoria: "Reformas e Reparos", descricao: "Preciso pintar as paredes de uma sala de estar com aproximadamente 20m². As paredes estão em bom estado, só precisam de uma nova camada de tinta branca.", urgencia: "Nas próximas semanas", localidade: "São Paulo, SP" },
+            { id: 2, userId: 3, titulo: "Instalar chuveiro elétrico", categoria: "Serviços Domésticos", descricao: "Comprei um chuveiro novo e preciso que alguém faça a instalação elétrica e hidráulica de forma segura.", urgencia: "Urgente (hoje ou amanhã)", localidade: "São Paulo, SP" }
         ];
 
         // --- ESTADO DA APLICAÇÃO ---
         let currentUser = null;
         let users = [];
         let serviceProviders = [];
+        let serviceRequests = [];
+        let currentRegistrationStep = 1;
+        const totalRegistrationSteps = 4;
         
         // --- FUNÇÕES ---
 
@@ -630,8 +659,12 @@
             if (!localStorage.getItem('conecta_providers')) {
                  localStorage.setItem('conecta_providers', JSON.stringify(initialServiceProviders));
             }
+            if (!localStorage.getItem('conecta_requests')) {
+                 localStorage.setItem('conecta_requests', JSON.stringify(initialServiceRequests));
+            }
             users = JSON.parse(localStorage.getItem('conecta_users'));
             serviceProviders = JSON.parse(localStorage.getItem('conecta_providers'));
+            serviceRequests = JSON.parse(localStorage.getItem('conecta_requests'));
         }
 
         function saveUsers() {
@@ -642,8 +675,12 @@
              localStorage.setItem('conecta_providers', JSON.stringify(serviceProviders));
         }
 
+        function saveRequests() {
+            localStorage.setItem('conecta_requests', JSON.stringify(serviceRequests));
+        }
+
         async function populateSearchFiltersForClient() {
-            if (currentUser && currentUser.tipo === 'cliente' && currentUser.cep) {
+            if (currentUser && currentUser.cep) {
                 document.getElementById('search-cep').value = currentUser.cep;
                 const result = await fetchCEPData(currentUser.cep);
                 if (result.data) {
@@ -674,37 +711,30 @@
             const headerFotoPerfil = document.getElementById('header-foto-perfil');
             const perfilDropdownMenu = document.getElementById('perfil-dropdown-menu');
             const greetingMessage = document.getElementById('greeting-message');
-            const btnAbrirAnuncio = document.getElementById('btn-abrir-anuncio');
+            const btnHeaderAnunciar = document.getElementById('btn-header-anunciar');
 
             if (currentUser) {
                 headerAnonimo.classList.add('hidden');
                 headerLogado.classList.remove('hidden');
                 headerLogado.classList.add('flex');
-                headerFotoPerfil.src = currentUser.foto;
+                headerFotoPerfil.src = currentUser.foto || 'https://placehold.co/40x40/cccccc/ffffff?text=U';
+                greetingMessage.textContent = `Olá, ${currentUser.nome.split(' ')[0]}`;
 
-                if (currentUser.tipo === 'cliente') {
-                    greetingMessage.textContent = `Olá, ${currentUser.nome.split(' ')[0]}`;
-                    greetingMessage.classList.remove('hidden');
-                    btnAbrirAnuncio.classList.add('hidden');
-                    perfilDropdownMenu.innerHTML = `
-                        <a href="#" id="btn-editar-perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar Perfil</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preferências</a>
-                        <div class="border-t border-gray-100 my-1"></div>
-                        <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
-                    `;
-                } else if (currentUser.tipo === 'prestador') {
-                    greetingMessage.classList.add('hidden');
-                    btnAbrirAnuncio.classList.remove('hidden');
-                    perfilDropdownMenu.innerHTML = `
-                        <a href="#" id="btn-editar-perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
-                        <div class="border-t border-gray-100 my-1"></div>
-                        <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
-                    `;
+                if (currentUser.papeis.includes('prestador')) {
+                    btnHeaderAnunciar.classList.remove('hidden');
+                } else {
+                    btnHeaderAnunciar.classList.add('hidden');
                 }
+
+                perfilDropdownMenu.innerHTML = `
+                    <a href="#" id="btn-abrir-dashboard" class="block px-4 py-2 text-sm text-[hsl(var(--card-foreground))] hover:bg-[hsl(var(--secondary))]">Meu Painel</a>
+                    <div class="border-t border-[hsl(var(--border))] my-1"></div>
+                    <a href="#" id="btn-logout-dynamic" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-500/10">Sair</a>
+                `;
                 
                 // Add event listeners to dynamically created buttons
                 document.getElementById('btn-logout-dynamic')?.addEventListener('click', handleLogout);
-                document.getElementById('btn-editar-perfil')?.addEventListener('click', openEditProfileModal);
+                document.getElementById('btn-abrir-dashboard')?.addEventListener('click', openDashboardModal);
 
             } else {
                 headerAnonimo.classList.remove('hidden');
@@ -782,177 +812,59 @@
             if (errorSpan) errorSpan.textContent = message;
         }
 
-        function handleRegisterCliente(event) {
+        function handleUnifiedRegister(event) {
             event.preventDefault();
+            
+            if(!validateRegistrationStep(totalRegistrationSteps)) return;
+
             const form = event.target;
-            clearFormErrors(form);
-            let errors = {};
-            
-            // Validation logic
-            const nomeCliente = form.elements['cliente-nome'].value.trim();
-            const email = form.elements['cliente-email'].value;
-            const emailConfirm = form.elements['cliente-email-confirm'].value;
-
-            if (!nomeCliente) {
-                errors['cliente-nome'] = 'O campo Nome Completo é obrigatório.';
-            } else if (nomeCliente.split(' ').length < 2) {
-                errors['cliente-nome'] = 'Por favor, insira seu nome e sobrenome.';
-            }
-
-            if (!email) {
-                errors['cliente-email'] = 'O campo E-mail é obrigatório.';
-            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-                errors['cliente-email'] = 'Formato de e-mail inválido.';
-            } else if (users.some(u => u.email === email)) {
-                errors['cliente-email'] = 'Este e-mail já está em uso.';
-            }
-            
-            if (!emailConfirm) {
-                errors['cliente-email-confirm'] = 'A confirmação de e-mail é obrigatória.';
-            } else if (email !== emailConfirm) {
-                errors['cliente-email-confirm'] = 'Os e-mails não coincidem.';
-            }
-
-            if (!form.elements['cliente-senha'].value) {
-                errors['cliente-senha'] = 'O campo Senha é obrigatório.';
-            } else if (form.elements['cliente-senha'].value.length < 8) {
-                errors['cliente-senha'] = 'A senha deve ter no mínimo 8 caracteres.';
-            }
-
-            if (!form.elements['cliente-cpf'].value) errors['cliente-cpf'] = 'O campo CPF é obrigatório.';
-            else if (!validateCPF(form.elements['cliente-cpf'].value)) errors['cliente-cpf'] = 'CPF inválido.';
-            if (!form.elements['cliente-nascimento'].value) errors['cliente-nascimento'] = 'O campo Data de Nascimento é obrigatório.';
-            else if (!validateAge(form.elements['cliente-nascimento'].value)) errors['cliente-nascimento'] = 'A idade mínima para cadastro é de 15 anos.';
-            if (!form.elements['cliente-cep'].value) errors['cliente-cep'] = 'O campo CEP é obrigatório.';
-            if (!form.elements['cliente-numero'].value) errors['cliente-numero'] = 'O campo Número é obrigatório.';
-
-            if (Object.keys(errors).length > 0) {
-                Object.entries(errors).forEach(([fieldName, message]) => {
-                    setFieldError(form, fieldName, message);
-                });
-                showNotification('Por favor, corrija os campos indicados.', 'error');
-                return;
-            }
-            
-            const newUser = {
-                id: Date.now(),
-                tipo: 'cliente',
-                email: form.elements['cliente-email'].value,
-                senha: form.elements['cliente-senha'].value,
-                nome: form.elements['cliente-nome'].value,
-                cpf: form.elements['cliente-cpf'].value,
-                nascimento: form.elements['cliente-nascimento'].value,
-                cep: form.elements['cliente-cep'].value,
-                rua: form.elements['cliente-rua'].value,
-                bairro: form.elements['cliente-bairro'].value,
-                cidade: form.elements['cliente-cidade'].value,
-                estado: form.elements['cliente-estado'].value,
-                foto: `https://i.pravatar.cc/150?u=${form.elements['cliente-email'].value}`
-            };
-            
-            users.push(newUser);
-            saveUsers();
-            
-            showNotification('Cadastro de cliente realizado com sucesso!', 'success');
-            closeModal(document.getElementById('modal-cadastro-cliente'));
-            form.reset();
-            clearFormErrors(form);
-            
-            currentUser = newUser;
-            sessionStorage.setItem('conecta_userId', currentUser.id);
-            updateHeaderUI();
-            populateSearchFiltersForClient();
-        }
-
-        async function handleRegisterPrestador(event) {
-            event.preventDefault();
-            const form = event.target;
-            clearFormErrors(form);
-            let errors = {};
-
-            // Validation logic
-            const nomePrestador = form.elements['prestador-nome'].value.trim();
-            const email = form.elements['prestador-email'].value;
-            const emailConfirm = form.elements['prestador-email-confirm'].value;
-
-            if (!nomePrestador) {
-                errors['prestador-nome'] = 'O campo Nome Completo é obrigatório.';
-            } else if (nomePrestador.split(' ').length < 2) {
-                errors['prestador-nome'] = 'Por favor, insira seu nome e sobrenome.';
-            }
-
-            if (!email) {
-                errors['prestador-email'] = 'O campo E-mail é obrigatório.';
-            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-                errors['prestador-email'] = 'Formato de e-mail inválido.';
-            } else if (users.some(u => u.email === email)) {
-                errors['prestador-email'] = 'Este e-mail já está em uso.';
-            }
-
-            if (!emailConfirm) {
-                errors['prestador-email-confirm'] = 'A confirmação de e-mail é obrigatória.';
-            } else if (email !== emailConfirm) {
-                errors['prestador-email-confirm'] = 'Os e-mails não coincidem.';
-            }
-
-            if (!form.elements['prestador-senha'].value) {
-                errors['prestador-senha'] = 'O campo Senha é obrigatório.';
-            } else if (form.elements['prestador-senha'].value.length < 8) {
-                errors['prestador-senha'] = 'A senha deve ter no mínimo 8 caracteres.';
-            }
-
-            if (!form.elements['prestador-cpf'].value) errors['prestador-cpf'] = 'O campo CPF é obrigatório.';
-            else if (!validateCPF(form.elements['prestador-cpf'].value)) errors['prestador-cpf'] = 'CPF inválido.';
-            if (!form.elements['prestador-nascimento'].value) errors['prestador-nascimento'] = 'O campo Data de Nascimento é obrigatório.';
-            else if (!validateAge(form.elements['prestador-nascimento'].value)) errors['prestador-nascimento'] = 'A idade mínima para cadastro é de 15 anos.';
-            if (!form.elements['prestador-telefone'].value) errors['prestador-telefone'] = 'O campo Telefone é obrigatório.';
-            if (!form.elements['prestador-cep'].value) errors['prestador-cep'] = 'O campo CEP é obrigatório.';
-            if (!form.elements['prestador-numero'].value) errors['prestador-numero'] = 'O campo Número é obrigatório.';
-            if (!form.elements['prestador-servico'].value) errors['prestador-servico'] = 'O campo Serviço Prestado é obrigatório.';
-            if (form.elements['prestador-foto'].files.length === 0) errors['prestador-foto'] = 'A Foto de Perfil é obrigatória.';
-
-            if (Object.keys(errors).length > 0) {
-                Object.entries(errors).forEach(([fieldName, message]) => {
-                    setFieldError(form, fieldName, message);
-                });
-                showNotification('Por favor, corrija os campos indicados.', 'error');
-                return;
-            }
-
-            const fotoInput = form.elements['prestador-foto'];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
+            const processRegistration = (fotoDataUrl = null) => {
+                const email = form.elements['cadastro-email'].value;
                 const newUser = {
                     id: Date.now(),
-                    tipo: 'prestador',
-                    email: form.elements['prestador-email'].value,
-                    senha: form.elements['prestador-senha'].value,
-                    nome: form.elements['prestador-nome'].value,
-                    cpf: form.elements['prestador-cpf'].value,
-                    nascimento: form.elements['prestador-nascimento'].value,
-                    telefone: form.elements['prestador-telefone'].value,
-                    cep: form.elements['prestador-cep'].value,
-                    servicoPrincipal: form.elements['prestador-servico'].value,
-                    raio: form.elements['prestador-raio'].value,
-                    foto: e.target.result,
-                    descricao_longa: '' // Add empty description on registration
+                    email: email,
+                    senha: form.elements['cadastro-senha'].value,
+                    nome: form.elements['cadastro-nome'].value,
+                    cpf: form.elements['cadastro-cpf'].value,
+                    nascimento: form.elements['cadastro-nascimento'].value,
+                    cep: form.elements['cadastro-cep'].value,
+                    rua: form.elements['cadastro-rua'].value,
+                    bairro: form.elements['cadastro-bairro'].value,
+                    cidade: form.elements['cadastro-cidade'].value,
+                    numero: form.elements['cadastro-numero'].value,
+                    papeis: ['cliente'],
+                    foto: fotoDataUrl || `https://i.pravatar.cc/150?u=${email}`
                 };
-                
+
+                if (form.elements['quer-ser-prestador'].checked) {
+                    newUser.papeis.push('prestador');
+                    newUser.servicoPrincipal = form.elements['cadastro-servico'].value;
+                    newUser.telefone = form.elements['cadastro-telefone'].value;
+                }
+
                 users.push(newUser);
                 saveUsers();
                 
                 showNotification('Cadastro realizado com sucesso!', 'success');
-                closeModal(document.getElementById('modal-cadastro-prestador'));
+                closeModal(document.getElementById('modal-cadastro'));
                 form.reset();
-                clearFormErrors(form);
+                document.getElementById('provider-fields').classList.add('hidden');
                 
+                // Auto-login
                 currentUser = newUser;
                 sessionStorage.setItem('conecta_userId', currentUser.id);
                 updateHeaderUI();
+                populateSearchFiltersForClient();
             };
 
-            reader.readAsDataURL(fotoInput.files[0]);
+            const isProvider = form.elements['quer-ser-prestador'].checked;
+            if (isProvider && form.elements['cadastro-foto'].files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = (e) => processRegistration(e.target.result);
+                reader.readAsDataURL(form.elements['cadastro-foto'].files[0]);
+            } else {
+                processRegistration();
+            }
         }
         
         async function handleLogin(event) {
@@ -1013,14 +925,13 @@
                 nome: currentUser.nome,
                 servico: form['anuncio-titulo'].value,
                 localidade: `${cepResult.data.localidade}, ${cepResult.data.uf}`,
-                latitude: cepResult.data.lat, // Supondo que a API retorne lat/lon
+                latitude: cepResult.data.lat,
                 longitude: cepResult.data.lon,
                 raio: currentUser.raio,
                 avaliacao: 0,
                 avaliacoesTotal: 0,
                 telefone: currentUser.telefone,
                 foto: currentUser.foto,
-                logo: currentUser.logo || null,
                 descricao_longa: form['anuncio-descricao'].value,
                 galeria_fotos: [],
                 avaliacoes_detalhadas: []
@@ -1064,6 +975,11 @@
             modalElement.classList.remove('hidden');
             modalElement.classList.add('flex');
             if(content) content.classList.remove('modal-scale-leave');
+
+            if (modalElement.id === 'modal-cadastro') {
+                currentRegistrationStep = 1;
+                showRegistrationStep(currentRegistrationStep);
+            }
         }
 
         function closeModal(modalElement) {
@@ -1086,7 +1002,6 @@
                 const data = await response.json();
                 if (data.erro) return { error: 'CEP não encontrado.' };
                 // Mocking lat/lon for ViaCEP as it doesn't provide them
-                // A real application would use another API to geocode the address
                 if (data.localidade === "São Paulo") {
                     data.lat = -23.550520;
                     data.lon = -46.633308;
@@ -1115,6 +1030,7 @@
             const radiusValue = document.getElementById('raio-atendimento').value;
 
             if ((cepInput || radiusValue) && !currentUser) {
+                document.getElementById('login-necessario-texto').textContent = 'Para utilizar a busca por endereço e raio, você precisa estar logado.';
                 openModal(document.getElementById('modal-login-necessario'));
                 return;
             }
@@ -1150,7 +1066,6 @@
                         const distance = calculateDistance(userLocation.lat, userLocation.lon, p.latitude, p.longitude);
                         return distance <= radiusKm;
                     }
-                    // If provider has no lat/lon, they can't be filtered by radius
                     return false;
                 });
             }
@@ -1175,50 +1090,64 @@
             showNotification("Agradecemos seu feedback!", "success");
         }
         
-        function generateStars(rating, size = 'w-4 h-4') {
+        function generateStars(rating, size = 'w-5 h-5') {
             let stars = '';
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 !== 0;
             const emptyStars = 5 - Math.ceil(rating);
             for (let i = 0; i < fullStars; i++) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
             if (halfStar) { stars += `<svg class="${size} text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118L10 15.347V2.927z"></path></svg>`; }
-            for (let i = 0; i < emptyStars; i++) { stars += `<svg class="${size} text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
+            for (let i = 0; i < emptyStars; i++) { stars += `<svg class="${size} text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.671a1 1 0 00.95.69h5.966c.969 0 1.371 1.24.588 1.81l-4.82 3.512a1 1 0 00-.364 1.118l1.846 5.671c.3.921-.755 1.688-1.54 1.118l-4.82-3.512a1 1 0 00-1.175 0l-4.82 3.512c-.784.57-1.838-.197-1.539-1.118l1.846-5.671a1 1 0 00-.364-1.118L2.05 11.098c-.783-.57-.38-1.81.588-1.81h5.966a1 1 0 00.95-.69l1.846-5.671z"></path></svg>`; }
             return `<div class="flex items-center">${stars}</div>`;
         }
 
         function displayServiceCards(providers) {
-            const grid = document.getElementById('service-cards-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
+            const list = document.getElementById('service-cards-list');
+            if (!list) return;
+            list.innerHTML = '';
             if (providers.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center">Nenhum resultado encontrado para os filtros aplicados.</p>`;
+                list.innerHTML = `<p class="text-[hsl(var(--muted-foreground))] col-span-full text-center">Nenhum resultado encontrado para os filtros aplicados.</p>`;
                 return;
             }
             providers.forEach(providerAd => {
                 const providerUser = users.find(u => u.id === providerAd.userId);
                 const mainServiceDisplay = providerUser ? providerUser.servicoPrincipal : providerAd.servico;
 
-                const cardHTML = `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                    <div class="relative card-clicavel" data-provider-id="${providerAd.id}">
-                        <img class="h-40 w-full object-cover pointer-events-none" src="${providerAd.foto}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Sem+Foto';" alt="Foto de ${providerAd.nome}">
-                        ${providerAd.logo ? `<img class="w-16 h-16 rounded-full border-4 border-white absolute -bottom-8 right-4 pointer-events-none" src="${providerAd.logo}" alt="Logo de ${providerAd.nome}">` : ''}
-                    </div>
-                    <div class="p-5 flex-grow card-clicavel" data-provider-id="${providerAd.id}">
-                        <div class="uppercase tracking-wide text-sm text-blue-600 font-semibold pointer-events-none">${mainServiceDisplay}</div>
-                        <p class="block mt-1 text-lg leading-tight font-bold text-black pointer-events-none">${providerAd.nome}</p>
-                        <p class="mt-2 text-sm text-gray-500 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            ${providerAd.localidade}
+                const cardHTML = `
+                <div class="bg-[hsl(var(--card))] rounded-2xl shadow-lg shadow-slate-500/5 dark:shadow-black/20 overflow-hidden hover:shadow-2xl hover:border-[hsl(var(--primary))] border-transparent border transition-all duration-300 flex flex-col md:flex-row group">
+                    <div class="p-6 md:w-3/4">
+                        <div class="flex items-start gap-4">
+                            <img class="w-16 h-16 rounded-full object-cover flex-shrink-0" src="${providerAd.foto}" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/ffffff?text=Sem+Foto';" alt="Foto de ${providerAd.nome}">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2">
+                                    <p class="font-bold text-lg text-[hsl(var(--card-foreground))]">${providerAd.nome}</p>
+                                    <span class="text-xs font-semibold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-500/20 dark:text-green-300">Destaque</span>
+                                </div>
+                                <p class="text-sm text-[hsl(var(--primary))] font-medium">${mainServiceDisplay}</p>
+                                <div class="flex items-center mt-1">
+                                    ${generateStars(providerAd.avaliacao, 'w-4 h-4')}
+                                    <span class="text-xs text-[hsl(var(--muted-foreground))] ml-2">${providerAd.avaliacao.toFixed(1)} (${providerAd.avaliacoesTotal} avaliações)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[hsl(var(--muted-foreground))] mt-4 h-12 overflow-hidden text-ellipsis">
+                            ${providerAd.descricao_longa}
                         </p>
-                    </div>
-                    <div class="p-4 bg-gray-50 border-t">
-                        <div class="flex items-center justify-between">
-                            ${generateStars(providerAd.avaliacao)}
-                            <span class="text-gray-600 text-sm font-medium" id="rating-text-${providerAd.id}">${providerAd.avaliacao.toFixed(1)} (${providerAd.avaliacoesTotal})</span>
+                         <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full dark:bg-slate-800 dark:text-slate-300">Elétrica Predial</span>
+                            <span class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full dark:bg-slate-800 dark:text-slate-300">Manutenção</span>
                         </div>
                     </div>
+                    <div class="p-6 md:w-1/4 bg-[hsl(var(--secondary))]/50 flex flex-col items-center justify-center text-center border-t md:border-t-0 md:border-l border-[hsl(var(--border))]">
+                        <p class="text-sm text-[hsl(var(--muted-foreground))]">Preço por hora</p>
+                        <p class="text-2xl font-bold text-[hsl(var(--card-foreground))]">R$ 150,00</p>
+                        <p class="text-xs text-[hsl(var(--muted-foreground))] mt-1">${providerAd.avaliacoesTotal} projetos realizados</p>
+                        <button class="w-full mt-4 card-clicavel bg-[hsl(var(--primary))] text-white px-4 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-all transform group-hover:scale-105" data-provider-id="${providerAd.id}">
+                            Contratar
+                        </button>
+                    </div>
                 </div>`;
-                grid.innerHTML += cardHTML;
+                list.innerHTML += cardHTML;
             });
         }
         
@@ -1227,177 +1156,9 @@
             if (!modalPerfil || !provider) return;
             const conteudoPerfil = document.getElementById('perfil-dinamico-conteudo');
             
-            conteudoPerfil.innerHTML = `<div class="flex flex-col md:flex-row items-start gap-6 mb-8"><img class="w-32 h-32 rounded-full border-4 border-white shadow-lg flex-shrink-0 object-cover" src="${provider.foto}" alt="Foto do prestador"><div class="flex-grow"><div class="flex items-center gap-4"><h2 class="text-3xl font-bold text-gray-900">${provider.nome}</h2>${provider.logo ? `<img class="w-12 h-12 rounded-lg" src="${provider.logo}" alt="Logo">` : ''}</div><p class="text-lg font-medium text-blue-600">${provider.servico}</p><div class="flex items-center mt-2">${generateStars(provider.avaliacao, 'w-5 h-5')}<span class="ml-2 text-gray-600 text-sm font-medium">${provider.avaliacao.toFixed(1)}</span><span class="ml-1 text-gray-500 text-sm">(${provider.avaliacoesTotal} avaliações)</span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><h4 class="text-lg font-semibold mb-2 text-gray-800">Sobre o Profissional</h4><p class="text-gray-600 leading-relaxed">${provider.descricao_longa}</p></div><div><h4 class="text-lg font-semibold mb-2 text-gray-800">Localização</h4><p class="text-gray-600 flex items-center gap-2"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${provider.localidade}</p></div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">Galeria de Trabalhos</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${(provider.galeria_fotos || []).map(fotoUrl => `<img src="${fotoUrl}" alt="Foto do trabalho" class="w-full h-32 object-cover rounded-lg">`).join('')}</div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-gray-800">O que os clientes dizem</h4><div class="space-y-4">${(provider.avaliacoes_detalhadas || []).map(aval => `<div class="bg-white p-4 rounded-lg border"><div class="flex items-center mb-2">${generateStars(aval.nota)}<p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p></div><p class="text-gray-600">"${aval.comentario}"</p></div>`).join('') || '<p class="text-gray-500">Nenhuma avaliação ainda.</p>'}</div></div><div class="p-6 border-t bg-gray-100 flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 -m-8 mt-8"><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Iniciar Chat</button><button class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Solicitar Orçamento</button></div>`;
+            conteudoPerfil.innerHTML = `<div class="flex flex-col md:flex-row items-start gap-8 mb-8"><img class="w-40 h-40 rounded-full border-4 border-[hsl(var(--card))] shadow-lg flex-shrink-0 object-cover" src="${provider.foto}" alt="Foto do prestador"><div class="flex-grow"><div class="flex items-center gap-4"><h2 class="text-4xl font-bold text-[hsl(var(--foreground))]">${provider.nome}</h2>${provider.logo ? `<img class="w-12 h-12 rounded-lg" src="${provider.logo}" alt="Logo">` : ''}</div><p class="text-xl font-medium text-[hsl(var(--primary))]">${provider.servico}</p><div class="flex items-center mt-2">${generateStars(provider.avaliacao, 'w-5 h-5')}<span class="ml-2 text-[hsl(var(--muted-foreground))] text-sm font-medium">${provider.avaliacao.toFixed(1)}</span><span class="ml-1 text-[hsl(var(--muted-foreground))] text-sm">(${provider.avaliacoesTotal} avaliações)</span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><h4 class="text-lg font-semibold mb-2 text-[hsl(var(--foreground))]">Sobre o Profissional</h4><p class="text-[hsl(var(--muted-foreground))] leading-relaxed">${provider.descricao_longa}</p></div><div><h4 class="text-lg font-semibold mb-2 text-[hsl(var(--foreground))]">Localização</h4><p class="text-[hsl(var(--muted-foreground))] flex items-center gap-2"><svg class="w-5 h-5 text-[hsl(var(--muted-foreground))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${provider.localidade}</p></div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-[hsl(var(--foreground))]">Galeria de Trabalhos</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${(provider.galeria_fotos || []).map(fotoUrl => `<img src="${fotoUrl}" alt="Foto do trabalho" class="w-full h-32 object-cover rounded-lg">`).join('')}</div></div><div class="mt-8"><h4 class="text-lg font-semibold mb-4 text-[hsl(var(--foreground))]">O que os clientes dizem</h4><div class="space-y-4">${(provider.avaliacoes_detalhadas || []).map(aval => `<div class="bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))]"><div class="flex items-center mb-2">${generateStars(aval.nota)}<p class="ml-auto text-sm font-semibold text-[hsl(var(--card-foreground))]">${aval.cliente}</p></div><p class="text-[hsl(var(--muted-foreground))]">"${aval.comentario}"</p></div>`).join('') || '<p class="text-[hsl(var(--muted-foreground))]">Nenhuma avaliação ainda.</p>'}</div></div><div class="p-6 border-t border-[hsl(var(--border))] bg-[hsl(var(--secondary))]/50 flex flex-col sm:flex-row justify-end items-center gap-3 sticky bottom-0 -m-8 mt-8"><button class="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-[hsl(var(--secondary-foreground))] bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg hover:opacity-90 transition-all">Iniciar Chat</button><button class="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-[hsl(var(--primary))]/30">Solicitar Orçamento</button></div>`;
             openModal(document.getElementById('modal-perfil-prestador'));
             document.getElementById('modal-perfil-content').scrollTop = 0;
-        }
-
-        function openEditProfileModal() {
-            const modal = document.getElementById('modal-editar-perfil');
-            const content = document.getElementById('editar-perfil-conteudo');
-            if (!currentUser) return;
-
-            const isProvider = currentUser.tipo === 'prestador';
-            
-            const providerFields = isProvider ? `
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Profissionais</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="edit-telefone" class="block text-sm font-medium text-gray-700">Telefone / WhatsApp</label>
-                            <input type="tel" id="edit-telefone" name="edit-telefone" value="${currentUser.telefone || ''}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <span id="edit-telefone-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div>
-                            <label for="edit-servico" class="block text-sm font-medium text-gray-700">Principal Serviço Prestado</label>
-                            <input type="text" id="edit-servico" name="edit-servico" value="${currentUser.servicoPrincipal || ''}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                             <span id="edit-servico-error" class="text-xs text-red-600 error-message block"></span>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="edit-descricao-longa" class="block text-sm font-medium text-gray-700">Descrição Detalhada do Serviço</label>
-                            <textarea id="edit-descricao-longa" name="edit-descricao-longa" rows="4" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">${currentUser.descricao_longa || ''}</textarea>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Minhas Avaliações</h4>
-                    <div id="provider-reviews" class="space-y-4">
-                        <!-- Avaliações serão inseridas aqui -->
-                    </div>
-                </div>
-            ` : '';
-
-            content.innerHTML = `
-                <form id="form-editar-perfil" class="space-y-4" novalidate>
-                     <div>
-                        <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Foto de Perfil</h4>
-                        <div class="flex items-center gap-4">
-                            <img id="edit-foto-preview" src="${currentUser.foto}" alt="Foto de Perfil" class="w-24 h-24 rounded-full object-cover">
-                            <div>
-                                <label for="edit-foto" class="block text-sm font-medium text-gray-700">Alterar Foto</label>
-                                <input type="file" id="edit-foto" name="edit-foto" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-lg text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label for="edit-nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                                <input type="text" id="edit-nome" name="edit-nome" value="${currentUser.nome}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <span id="edit-nome-error" class="text-xs text-red-600 error-message block"></span>
-                            </div>
-                             <div>
-                                <label for="edit-email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                                <input type="email" id="edit-email" name="edit-email" value="${currentUser.email}" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <span id="edit-email-error" class="text-xs text-red-600 error-message block"></span>
-                            </div>
-                        </div>
-                    </div>
-                    ${providerFields}
-                </form>
-            `;
-
-            if (isProvider) {
-                const reviewsContainer = document.getElementById('provider-reviews');
-                const providerAds = serviceProviders.filter(p => p.userId === currentUser.id);
-                const allReviews = providerAds.flatMap(ad => ad.avaliacoes_detalhadas);
-
-                if (allReviews.length > 0) {
-                    reviewsContainer.innerHTML = allReviews.map(aval => `
-                        <div class="bg-gray-100 p-4 rounded-lg border">
-                            <div class="flex items-center mb-2">
-                                ${generateStars(aval.nota)}
-                                <p class="ml-auto text-sm font-semibold text-gray-800">${aval.cliente}</p>
-                            </div>
-                            <p class="text-gray-600">"${aval.comentario}"</p>
-                        </div>
-                    `).join('');
-                } else {
-                    reviewsContainer.innerHTML = '<p class="text-gray-500">Você ainda não recebeu nenhuma avaliação.</p>';
-                }
-            }
-            
-            document.getElementById('form-editar-perfil').addEventListener('submit', handleUpdateProfile);
-            document.getElementById('edit-foto').addEventListener('change', (e) => {
-                const preview = document.getElementById('edit-foto-preview');
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        preview.src = event.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            openModal(modal);
-        }
-
-        function handleUpdateProfile(event) {
-            event.preventDefault();
-            const form = event.target;
-            clearFormErrors(form);
-            let errors = {};
-
-            const nome = form.elements['edit-nome'].value.trim();
-            if (!nome) {
-                errors['edit-nome'] = 'O campo Nome Completo é obrigatório.';
-            } else if (nome.split(' ').length < 2) {
-                errors['edit-nome'] = 'Por favor, insira seu nome e sobrenome.';
-            }
-            // Add other validations as needed...
-
-            if (Object.keys(errors).length > 0) {
-                Object.entries(errors).forEach(([fieldName, message]) => {
-                    setFieldError(form, fieldName, message);
-                });
-                showNotification('Por favor, corrija os campos indicados.', 'error');
-                return;
-            }
-
-            const userIndex = users.findIndex(u => u.id === currentUser.id);
-            if(userIndex !== -1) {
-                const fotoInput = form.elements['edit-foto'];
-                const processUpdate = (newPhotoData) => {
-                    users[userIndex].nome = nome;
-                    users[userIndex].email = form.elements['edit-email'].value;
-                    if(newPhotoData) users[userIndex].foto = newPhotoData;
-
-                    if(currentUser.tipo === 'prestador') {
-                        const newDescription = form.elements['edit-descricao-longa'].value;
-                        users[userIndex].telefone = form.elements['edit-telefone'].value;
-                        users[userIndex].servicoPrincipal = form.elements['edit-servico'].value;
-                        users[userIndex].descricao_longa = newDescription;
-
-                        // Also update the name, photo, and description in all serviceProviders ads
-                        serviceProviders.forEach(provider => {
-                            if (provider.userId === currentUser.id) {
-                                provider.nome = nome;
-                                if(newPhotoData) provider.foto = newPhotoData;
-                                provider.descricao_longa = newDescription;
-                            }
-                        });
-                        saveProviders();
-                    }
-                    
-                    currentUser = { ...users[userIndex] };
-                    saveUsers();
-                    
-                    showNotification('Perfil atualizado com sucesso!', 'success');
-                    closeModal(document.getElementById('modal-editar-perfil'));
-                    updateHeaderUI();
-                    displayServiceCards(serviceProviders); // Refresh cards to show new data
-                };
-
-                if (fotoInput.files.length > 0) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => processUpdate(e.target.result);
-                    reader.readAsDataURL(fotoInput.files[0]);
-                } else {
-                    processUpdate(null); // No new photo
-                }
-            }
         }
 
         function updateClock() {
@@ -1467,6 +1228,221 @@
                 buttonIcon.innerHTML = '✨';
             }
         }
+        
+        // --- FUNÇÕES DE PEDIDO DE SERVIÇO ---
+
+        function openRequestServiceModal() {
+            if (!currentUser) {
+                document.getElementById('login-necessario-texto').textContent = 'Para publicar um pedido de serviço, você precisa estar logado.';
+                openModal(document.getElementById('modal-login-necessario'));
+                return;
+            }
+            const modal = document.getElementById('modal-solicitar-servico');
+            if (currentUser.cep) {
+                const cepInput = document.getElementById('solicitar-servico-cep');
+                cepInput.value = currentUser.cep;
+                cepInput.dispatchEvent(new Event('blur'));
+            }
+            openModal(modal);
+        }
+        
+        async function handleRequestService(event) {
+            event.preventDefault();
+            const form = event.target;
+            clearFormErrors(form);
+            let errors = {};
+
+            if (!form.elements['solicitar-servico-titulo'].value.trim()) errors['solicitar-servico-titulo'] = 'O título é obrigatório.';
+            if (!form.elements['solicitar-servico-categoria'].value) errors['solicitar-servico-categoria'] = 'A categoria é obrigatória.';
+            if (!form.elements['solicitar-servico-urgencia'].value) errors['solicitar-servico-urgencia'] = 'A urgência é obrigatória.';
+            if (!form.elements['solicitar-servico-descricao'].value.trim()) errors['solicitar-servico-descricao'] = 'A descrição é obrigatória.';
+            if (!form.elements['solicitar-servico-cep'].value) errors['solicitar-servico-cep'] = 'O CEP é obrigatório.';
+
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([fieldName, message]) => setFieldError(form, fieldName, message));
+                showNotification('Por favor, corrija os campos indicados.', 'error');
+                return;
+            }
+
+            const newRequest = {
+                id: Date.now(),
+                userId: currentUser.id,
+                titulo: form.elements['solicitar-servico-titulo'].value,
+                categoria: form.elements['solicitar-servico-categoria'].value,
+                urgencia: form.elements['solicitar-servico-urgencia'].value,
+                descricao: form.elements['solicitar-servico-descricao'].value,
+                localidade: `${form.elements['solicitar-servico-cidade'].value}, ${form.elements['solicitar-servico-estado'].value}`
+            };
+
+            serviceRequests.unshift(newRequest);
+            saveRequests();
+
+            showNotification('Seu pedido de serviço foi publicado com sucesso!', 'success');
+            closeModal(document.getElementById('modal-solicitar-servico'));
+            form.reset();
+        }
+
+        function openViewRequestsModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('modal-ver-pedidos');
+            const container = document.getElementById('lista-pedidos-servico');
+            
+            container.innerHTML = '';
+
+            if (serviceRequests.length === 0) {
+                container.innerHTML = '<p class="text-[hsl(var(--muted-foreground))] text-center">Não há nenhum pedido de serviço aberto no momento.</p>';
+            } else {
+                serviceRequests.forEach(request => {
+                    const client = users.find(u => u.id === request.userId);
+                    const requestHTML = `
+                        <div class="bg-[hsl(var(--secondary))] border border-[hsl(var(--border))] rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                                <div>
+                                    <h4 class="font-bold text-lg text-[hsl(var(--primary))]">${request.titulo}</h4>
+                                    <p class="text-sm text-[hsl(var(--muted-foreground))]">
+                                        <span class="font-semibold">${request.categoria}</span> | 
+                                        <span class="text-red-600">${request.urgencia}</span> |
+                                        <span>${request.localidade}</span>
+                                    </p>
+                                </div>
+                                <div class="mt-3 sm:mt-0">
+                                    <button class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-[hsl(var(--primary))] rounded-lg hover:opacity-90 transition-all">Ver Detalhes e Responder</button>
+                                </div>
+                            </div>
+                             <p class="mt-3 text-[hsl(var(--foreground))] text-sm">${request.descricao.substring(0, 150)}...</p>
+                        </div>
+                    `;
+                    container.innerHTML += requestHTML;
+                });
+            }
+
+            openModal(modal);
+        }
+
+        // --- FUNÇÕES DO DASHBOARD ---
+        function openDashboardModal(event) {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('modal-dashboard');
+            const content = document.getElementById('dashboard-content');
+            
+            if (!currentUser) return;
+
+            const userAds = serviceProviders.filter(p => p.userId === currentUser.id);
+            const userRequests = serviceRequests.filter(r => r.userId === currentUser.id);
+            const isProvider = currentUser.papeis.includes('prestador');
+
+            const adListHTML = userAds.length > 0 ? userAds.map(ad => `
+                <div class="bg-[hsl(var(--card))] p-4 rounded-lg shadow-md flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img src="${ad.foto}" class="w-16 h-16 rounded-md object-cover">
+                        <div>
+                            <p class="font-bold text-[hsl(var(--card-foreground))]">${ad.servico}</p>
+                            <p class="text-sm text-[hsl(var(--muted-foreground))]">${ad.localidade}</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-right">
+                        <p class="text-[hsl(var(--muted-foreground))]"><strong>Avaliações:</strong> ${ad.avaliacoesTotal}</p>
+                        <p class="text-[hsl(var(--muted-foreground))]"><strong>Nota:</strong> ${ad.avaliacao.toFixed(1)} ★</p>
+                    </div>
+                </div>
+            `).join('') : `<div class="text-center py-12 bg-[hsl(var(--card))] rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                <h3 class="mt-2 text-lg font-medium text-[hsl(var(--card-foreground))]">Você ainda não possui anúncios</h3>
+                <p class="mt-1 text-sm text-[hsl(var(--muted-foreground))]">Comece a oferecer seus serviços para milhares de clientes.</p>
+                <div class="mt-6">
+                    <button type="button" id="dashboard-btn-criar-anuncio" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[hsl(var(--accent))] hover:opacity-90">
+                        Anunciar Grátis
+                    </button>
+                </div>
+            </div>`;
+
+            const requestListHTML = userRequests.length > 0 ? userRequests.map(req => `
+                 <div class="bg-[hsl(var(--card))] p-4 rounded-lg shadow-md">
+                    <p class="font-bold text-[hsl(var(--card-foreground))]">${req.titulo}</p>
+                    <p class="text-sm text-[hsl(var(--muted-foreground))]">${req.localidade} | <span class="font-medium">${req.categoria}</span></p>
+                </div>
+            `).join('') : `<div class="text-center py-12 bg-[hsl(var(--card))] rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <h3 class="mt-2 text-lg font-medium text-[hsl(var(--card-foreground))]">Você ainda não fez pedidos</h3>
+                <p class="mt-1 text-sm text-[hsl(var(--muted-foreground))]">Precisa de um serviço? Publique um pedido e receba propostas.</p>
+                 <div class="mt-6">
+                    <button type="button" id="dashboard-btn-solicitar" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[hsl(var(--accent))] hover:opacity-90">
+                        Publicar Pedido
+                    </button>
+                </div>
+            </div>`;
+
+            const providerProfileHTML = isProvider ? `
+                <h4 class="text-md font-semibold text-[hsl(var(--foreground))] mt-6 mb-2">Informações do Prestador</h4>
+                <p><strong>Serviço Principal:</strong> ${currentUser.servicoPrincipal || 'Não informado'}</p>
+                <p><strong>Telefone:</strong> ${currentUser.telefone || 'Não informado'}</p>
+            ` : `<div class="mt-6 p-4 bg-[hsl(var(--primary))]/10 rounded-lg text-center">
+                <h4 class="font-semibold text-[hsl(var(--foreground))]">Torne-se um prestador!</h4>
+                <p class="text-sm text-[hsl(var(--muted-foreground))] mt-1">Complete seu perfil para começar a oferecer seus serviços.</p>
+                <button id="btn-completar-perfil-prestador" class="mt-3 text-sm font-medium text-white bg-[hsl(var(--primary))] rounded-lg px-4 py-2 hover:opacity-90">Completar Perfil</button>
+            </div>`;
+
+            content.innerHTML = `
+                <div class="p-6">
+                    <div class="border-b border-[hsl(var(--border))]">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            ${isProvider ? '<button type="button" data-tab="anuncios" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" aria-selected="true">Meus Anúncios</button>' : ''}
+                            <button type="button" data-tab="pedidos" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" aria-selected="${!isProvider}">Meus Pedidos</button>
+                            <button type="button" data-tab="configuracoes" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Configurações</button>
+                        </nav>
+                    </div>
+                    <div class="mt-6">
+                        <div id="tab-content-anuncios" class="tab-panel ${isProvider ? '' : 'hidden'}">
+                            <div class="border-b border-[hsl(var(--border))] mb-4">
+                                <nav class="-mb-px flex space-x-6 text-sm text-[hsl(var(--muted-foreground))]">
+                                    <a href="#" class="border-[hsl(var(--primary))] text-[hsl(var(--primary))] whitespace-nowrap pb-2 px-1 border-b-2 font-semibold">Publicados (${userAds.length})</a>
+                                    <a href="#" class="border-transparent hover:border-gray-300 whitespace-nowrap pb-2 px-1 border-b-2">Aguardando (0)</a>
+                                    <a href="#" class="border-transparent hover:border-gray-300 whitespace-nowrap pb-2 px-1 border-b-2">Inativos (0)</a>
+                                </nav>
+                            </div>
+                            <div class="space-y-4">${adListHTML}</div>
+                        </div>
+                        <div id="tab-content-pedidos" class="tab-panel ${isProvider ? 'hidden' : ''}">
+                             <div class="space-y-4">${requestListHTML}</div>
+                        </div>
+                        <div id="tab-content-configuracoes" class="hidden tab-panel bg-[hsl(var(--card))] p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-bold text-[hsl(var(--card-foreground))] mb-4">Minhas Informações</h3>
+                            <div class="flex items-start gap-6">
+                                <img src="${currentUser.foto}" class="w-24 h-24 rounded-full object-cover">
+                                <div class="text-[hsl(var(--muted-foreground))] space-y-1">
+                                    <p><strong>Nome:</strong> ${currentUser.nome}</p>
+                                    <p><strong>Email:</strong> ${currentUser.email}</p>
+                                    <p><strong>CEP:</strong> ${currentUser.cep}</p>
+                                    ${providerProfileHTML}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners for dashboard elements
+            content.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    content.querySelectorAll('.tab-button').forEach(btn => btn.setAttribute('aria-selected', 'false'));
+                    e.target.setAttribute('aria-selected', 'true');
+                    
+                    content.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+                    document.getElementById(`tab-content-${e.target.dataset.tab}`).classList.remove('hidden');
+                });
+            });
+
+            document.getElementById('dashboard-btn-criar-anuncio')?.addEventListener('click', () => {
+                closeModal(modal);
+                openModal(document.getElementById('modal-criar-anuncio'));
+            });
+             document.getElementById('dashboard-btn-solicitar')?.addEventListener('click', () => {
+                closeModal(modal);
+                openRequestServiceModal();
+            });
+
+            openModal(modal);
+        }
 
 
         // --- EVENT LISTENERS ---
@@ -1474,15 +1450,12 @@
         document.getElementById('btn-abrir-login').addEventListener('click', () => openModal(document.getElementById('modal-login')));
         document.getElementById('form-login').addEventListener('submit', handleLogin);
         
-        document.getElementById('form-cadastro-prestador').addEventListener('submit', handleRegisterPrestador);
-        document.getElementById('form-cadastro-cliente').addEventListener('submit', handleRegisterCliente);
+        document.getElementById('form-cadastro').addEventListener('submit', handleUnifiedRegister);
         document.getElementById('form-criar-anuncio').addEventListener('submit', handleCreateAd);
         
         document.querySelectorAll('.modal-backdrop').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                // Prevent closing on backdrop click for registration and edit modals
-                const isProtectedModal = modal.id === 'modal-cadastro-cliente' || modal.id === 'modal-cadastro-prestador' || modal.id === 'modal-editar-perfil' || modal.id === 'modal-criar-anuncio';
-                if (e.target === modal && !isProtectedModal) {
+                if (e.target === modal) {
                     closeModal(modal);
                 }
             });
@@ -1491,18 +1464,15 @@
             });
         });
 
-        document.getElementById('btn-abrir-escolha').addEventListener('click', () => openModal(document.getElementById('modal-escolha-cadastro')));
-        document.getElementById('btn-escolha-prestador').addEventListener('click', () => {
-            closeModal(document.getElementById('modal-escolha-cadastro'));
-            setTimeout(() => openModal(document.getElementById('modal-cadastro-prestador')), 300);
+        document.getElementById('btn-abrir-cadastro').addEventListener('click', () => openModal(document.getElementById('modal-cadastro')));
+        
+        document.getElementById('quer-ser-prestador').addEventListener('change', (e) => {
+            document.getElementById('provider-fields').classList.toggle('hidden', !e.target.checked);
         });
-        document.getElementById('btn-escolha-cliente').addEventListener('click', () => {
-            closeModal(document.getElementById('modal-escolha-cadastro'));
-            setTimeout(() => openModal(document.getElementById('modal-cadastro-cliente')), 300);
-        });
-        document.getElementById('btn-abrir-anuncio').addEventListener('click', () => {
-            if(currentUser && currentUser.tipo === 'prestador') {
-                document.getElementById('anuncio-tipo-servico').value = currentUser.servicoPrincipal;
+
+        document.getElementById('btn-header-anunciar')?.addEventListener('click', () => {
+            if(currentUser && currentUser.papeis.includes('prestador')) {
+                document.getElementById('anuncio-tipo-servico').value = currentUser.servicoPrincipal || '';
                 openModal(document.getElementById('modal-criar-anuncio'));
             }
         });
@@ -1514,7 +1484,7 @@
 
         document.addEventListener('click', (e) => {
              const dropdownContainer = document.getElementById('perfil-dropdown-container');
-             if (!dropdownContainer.contains(e.target)) {
+             if (dropdownContainer && !dropdownContainer.contains(e.target)) {
                 document.getElementById('perfil-dropdown-menu').classList.add('hidden');
              }
         });
@@ -1525,7 +1495,10 @@
         });
         
         const setupCepListener = (cepId, ruaId, bairroId, cidadeId, estadoId) => {
-            document.getElementById(cepId).addEventListener('blur', async (e) => {
+            const cepEl = document.getElementById(cepId);
+            if (!cepEl) return;
+
+            cepEl.addEventListener('blur', async (e) => {
                 const result = await fetchCEPData(e.target.value);
                 const ruaEl = document.getElementById(ruaId);
                 const bairroEl = document.getElementById(bairroId);
@@ -1533,20 +1506,25 @@
                 const estadoEl = document.getElementById(estadoId);
 
                 if (result.data) {
-                    ruaEl.value = result.data.logradouro || '';
-                    bairroEl.value = result.data.bairro || '';
-                    cidadeEl.value = result.data.localidade || '';
-                    estadoEl.value = result.data.uf || '';
+                    if (ruaEl) ruaEl.value = result.data.logradouro || '';
+                    if (bairroEl) bairroEl.value = result.data.bairro || '';
+                    if (cidadeEl) cidadeEl.value = result.data.localidade || '';
+                    if (estadoEl) estadoEl.value = result.data.uf || '';
                 } else {
-                    [ruaEl, bairroEl, cidadeEl, estadoEl].forEach(el => el.value = '');
-                    if (cepId !== 'search-cep') showNotification(result.error, 'error');
+                    [ruaEl, bairroEl, cidadeEl, estadoEl].forEach(el => {
+                        if (el) el.value = '';
+                    });
+                    if (cepId !== 'search-cep' && e.target.value) {
+                        showNotification(result.error, 'error');
+                    }
                 }
             });
         };
 
-        setupCepListener('prestador-cep', 'prestador-rua', 'prestador-bairro', 'prestador-cidade', 'prestador-estado');
-        setupCepListener('cliente-cep', 'cliente-rua', 'cliente-bairro', 'cliente-cidade', 'cliente-estado');
+        setupCepListener('cadastro-cep', 'cadastro-rua', 'cadastro-bairro', 'cadastro-cidade', ''); // Estado não vem da API
         setupCepListener('search-cep', 'search-rua', 'search-bairro', 'search-cidade', 'search-estado');
+        setupCepListener('solicitar-servico-cep', '', '', 'solicitar-servico-cidade', 'solicitar-servico-estado');
+
 
         document.getElementById('anuncio-fotos').addEventListener('change', function(event) {
             const previewContainer = document.getElementById('fotos-preview');
@@ -1570,7 +1548,7 @@
             });
         });
         
-        document.getElementById('service-cards-grid').addEventListener('click', function(e) {
+        document.getElementById('service-cards-list').addEventListener('click', function(e) {
             const cardClicavel = e.target.closest('.card-clicavel');
             if (cardClicavel) {
                 const providerId = cardClicavel.dataset.providerId;
@@ -1589,6 +1567,10 @@
 
         // Gemini AI button
         document.getElementById('btn-gerar-descricao').addEventListener('click', generateDescriptionWithAI);
+
+        // Service Request Listeners
+        document.getElementById('btn-abrir-solicitar-servico').addEventListener('click', openRequestServiceModal);
+        document.getElementById('form-solicitar-servico').addEventListener('submit', handleRequestService);
         
         // --- CHAMADA INICIAL ---
         initializeData();
